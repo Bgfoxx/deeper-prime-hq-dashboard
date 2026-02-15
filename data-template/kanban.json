@@ -1,0 +1,75 @@
+{
+  "columns": [
+    {
+      "id": "backlog",
+      "title": "Backlog",
+      "cards": [
+        {
+          "id": "card-001",
+          "title": "Research best platforms for hosting Recalibration Assessment",
+          "description": "Find 3-5 options for hosting the Recalibration Assessment. Consider free/low-cost tools that allow custom scoring and email capture.",
+          "priority": "high",
+          "createdAt": "2026-02-15T00:00:00.000Z",
+          "updatedAt": "2026-02-15T00:00:00.000Z",
+          "labels": ["research", "tool-building"],
+          "apolloNotes": ""
+        },
+        {
+          "id": "card-002",
+          "title": "Draft email reactivation sequence (3 emails)",
+          "description": "Create a 3-email sequence to re-engage the dormant email list. Tone: warm, honest about the gap, excited about what's coming.",
+          "priority": "high",
+          "createdAt": "2026-02-15T00:00:00.000Z",
+          "updatedAt": "2026-02-15T00:00:00.000Z",
+          "labels": ["content"],
+          "apolloNotes": ""
+        },
+        {
+          "id": "card-003",
+          "title": "Compile list of 20 YouTube video title ideas for first 8 weeks",
+          "description": "Generate 20 compelling video title options across the 7 content angles for the first 8 weeks of Sprint 1.",
+          "priority": "medium",
+          "createdAt": "2026-02-15T00:00:00.000Z",
+          "updatedAt": "2026-02-15T00:00:00.000Z",
+          "labels": ["content", "research"],
+          "apolloNotes": ""
+        },
+        {
+          "id": "card-004",
+          "title": "Research competitor channels/communities in the 40-60 identity/transition space",
+          "description": "Identify 10-15 creators, communities, and channels serving men aged 40-60 going through identity/career transitions.",
+          "priority": "medium",
+          "createdAt": "2026-02-15T00:00:00.000Z",
+          "updatedAt": "2026-02-15T00:00:00.000Z",
+          "labels": ["research"],
+          "apolloNotes": ""
+        },
+        {
+          "id": "card-005",
+          "title": "Set up YouTube channel keywords and optimize descriptions",
+          "description": "Research best keywords for the channel niche. Update channel description, about section, and default video descriptions.",
+          "priority": "medium",
+          "createdAt": "2026-02-15T00:00:00.000Z",
+          "updatedAt": "2026-02-15T00:00:00.000Z",
+          "labels": ["admin"],
+          "apolloNotes": ""
+        },
+        {
+          "id": "card-006",
+          "title": "Design Recalibration Assessment question framework",
+          "description": "Create the question structure, scoring logic, and result categories for the Recalibration Assessment.",
+          "priority": "high",
+          "createdAt": "2026-02-15T00:00:00.000Z",
+          "updatedAt": "2026-02-15T00:00:00.000Z",
+          "labels": ["tool-building", "research"],
+          "apolloNotes": ""
+        }
+      ]
+    },
+    { "id": "in-progress", "title": "In Progress", "cards": [] },
+    { "id": "review", "title": "Review", "cards": [] },
+    { "id": "done", "title": "Done", "cards": [] }
+  ],
+  "archive": [],
+  "lastModified": "2026-02-15T00:00:00.000Z"
+}

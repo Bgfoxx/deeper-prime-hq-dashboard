@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -20,9 +18,17 @@
 # production
 /build
 
+# data (synced via Syncthing, never committed)
+/data/
+
+# AI agent toolkit & prompts
+/.agent/
+deeper_prime_hq_master_prompt_1.md
+
 # misc
 .DS_Store
 *.pem
+*.sync-conflict-*
 
 # debug
 npm-debug.log*
@@ -30,8 +36,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files
+.env.local
+.env*.local
 
 # vercel
 .vercel

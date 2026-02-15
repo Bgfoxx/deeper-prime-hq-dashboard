@@ -1,0 +1,119 @@
+{
+  "content": [
+    {
+      "id": "content-001",
+      "title": "What Do You Do? - The Question That's About to Break",
+      "angle": "What do you do? obsolescence",
+      "stage": "idea",
+      "formats": {
+        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
+        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
+        "email": { "status": "not-started", "publishDate": null, "url": "" }
+      },
+      "coreIdea": "The most common question we ask when meeting someone - 'What do you do?' - is already starting to fail us. Reframe from someday to NOW.",
+      "notes": "",
+      "weekNumber": 1,
+      "createdAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "content-002",
+      "title": "When Your Expertise Becomes Worthless Overnight",
+      "angle": "Expertise devaluation",
+      "stage": "idea",
+      "formats": {
+        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
+        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
+        "email": { "status": "not-started", "publishDate": null, "url": "" }
+      },
+      "coreIdea": "",
+      "notes": "",
+      "weekNumber": 2,
+      "createdAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "content-003",
+      "title": "Building a New Identity When the Old One Crumbles",
+      "angle": "Identity scaffolding",
+      "stage": "idea",
+      "formats": {
+        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
+        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
+        "email": { "status": "not-started", "publishDate": null, "url": "" }
+      },
+      "coreIdea": "",
+      "notes": "",
+      "weekNumber": 3,
+      "createdAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "content-004",
+      "title": "Your Body Is Your Last Competitive Advantage",
+      "angle": "Body as strategic asset",
+      "stage": "idea",
+      "formats": {
+        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
+        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
+        "email": { "status": "not-started", "publishDate": null, "url": "" }
+      },
+      "coreIdea": "",
+      "notes": "",
+      "weekNumber": 4,
+      "createdAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "content-005",
+      "title": "The Loneliness No One Talks About After 40",
+      "angle": "Male loneliness and depth",
+      "stage": "idea",
+      "formats": {
+        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
+        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
+        "email": { "status": "not-started", "publishDate": null, "url": "" }
+      },
+      "coreIdea": "",
+      "notes": "",
+      "weekNumber": 5,
+      "createdAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "content-006",
+      "title": "You're Preparing for the Wrong Future",
+      "angle": "Preparing for wrong future",
+      "stage": "idea",
+      "formats": {
+        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
+        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
+        "email": { "status": "not-started", "publishDate": null, "url": "" }
+      },
+      "coreIdea": "",
+      "notes": "",
+      "weekNumber": 6,
+      "createdAt": "2026-02-15T00:00:00.000Z"
+    },
+    {
+      "id": "content-007",
+      "title": "AI Isn't Replacing You - It's Revealing You",
+      "angle": "AI as mirror",
+      "stage": "idea",
+      "formats": {
+        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
+        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
+        "email": { "status": "not-started", "publishDate": null, "url": "" }
+      },
+      "coreIdea": "",
+      "notes": "",
+      "weekNumber": 7,
+      "createdAt": "2026-02-15T00:00:00.000Z"
+    }
+  ],
+  "angles": [
+    { "id": "angle-1", "name": "What do you do? obsolescence", "color": "#D97706" },
+    { "id": "angle-2", "name": "Expertise devaluation", "color": "#B45309" },
+    { "id": "angle-3", "name": "Identity scaffolding", "color": "#6B8F71" },
+    { "id": "angle-4", "name": "Body as strategic asset", "color": "#C2695B" },
+    { "id": "angle-5", "name": "Male loneliness and depth", "color": "#7C6F9C" },
+    { "id": "angle-6", "name": "Preparing for wrong future", "color": "#5B8A9C" },
+    { "id": "angle-7", "name": "AI as mirror", "color": "#9C8B5B" }
+  ],
+  "lastModified": "2026-02-15T00:00:00.000Z"
+}

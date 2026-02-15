@@ -1,0 +1,126 @@
+{
+  "currentSprint": {
+    "name": "Sprint 1: Become the Signal",
+    "startDate": "2026-02-17",
+    "endDate": "2026-05-18",
+    "vision": "Establish public voice, build audience, find what resonates. Do NOT build paid product yet.",
+    "successMetrics": [
+      { "id": "sm1", "metric": "1,000+ email subscribers", "current": 400, "target": 1000 },
+      { "id": "sm2", "metric": "Consistent weekly content rhythm", "status": "not-started" },
+      { "id": "sm3", "metric": "Identify 2-3 resonant content angles", "status": "not-started" },
+      { "id": "sm4", "metric": "Recalibration Assessment built and live", "status": "not-started" }
+    ],
+    "weeks": [
+      {
+        "weekNumber": 1,
+        "startDate": "2026-02-17",
+        "theme": "Launch: The 'What Do You Do?' Signal",
+        "objectives": [
+          { "id": "w1o1", "text": "Update all social media profiles (LinkedIn, YouTube, X, Instagram)", "done": false },
+          { "id": "w1o2", "text": "Finalize and post LinkedIn article - 'What do you do?' angle", "done": false },
+          { "id": "w1o3", "text": "Record and publish YouTube video - 'What do you do?' angle", "done": false },
+          { "id": "w1o4", "text": "Reactivate email list with comeback email", "done": false },
+          { "id": "w1o5", "text": "Share first content piece in WhatsApp community", "done": false }
+        ],
+        "reflections": ""
+      },
+      {
+        "weekNumber": 2,
+        "startDate": "2026-02-24",
+        "theme": "Expertise Devaluation",
+        "objectives": [
+          { "id": "w2o1", "text": "Write and publish LinkedIn post - expertise devaluation angle", "done": false },
+          { "id": "w2o2", "text": "Record and publish YouTube video - expertise devaluation angle", "done": false },
+          { "id": "w2o3", "text": "Send email to list with week's content", "done": false },
+          { "id": "w2o4", "text": "Engage with all comments and responses from week 1", "done": false }
+        ],
+        "reflections": ""
+      },
+      {
+        "weekNumber": 3,
+        "startDate": "2026-03-03",
+        "theme": "Identity Scaffolding",
+        "objectives": [
+          { "id": "w3o1", "text": "Write and publish LinkedIn post - identity scaffolding angle", "done": false },
+          { "id": "w3o2", "text": "Record and publish YouTube video - identity scaffolding angle", "done": false },
+          { "id": "w3o3", "text": "Begin building Recalibration Assessment (design + question framework)", "done": false },
+          { "id": "w3o4", "text": "Review first 2 weeks of engagement data - what resonated?", "done": false }
+        ],
+        "reflections": ""
+      },
+      {
+        "weekNumber": 4,
+        "startDate": "2026-03-10",
+        "theme": "Body as Strategic Asset",
+        "objectives": [
+          { "id": "w4o1", "text": "Write and publish LinkedIn post - body as strategic asset angle", "done": false },
+          { "id": "w4o2", "text": "Record and publish YouTube video - body as strategic asset angle", "done": false },
+          { "id": "w4o3", "text": "Complete and launch Recalibration Assessment MVP", "done": false },
+          { "id": "w4o4", "text": "Update all content CTAs to point to assessment", "done": false }
+        ],
+        "reflections": ""
+      },
+      {
+        "weekNumber": 5,
+        "startDate": "2026-03-17",
+        "theme": "Male Loneliness and Depth",
+        "objectives": [
+          { "id": "w5o1", "text": "Write and publish LinkedIn post - loneliness/depth angle", "done": false },
+          { "id": "w5o2", "text": "Record and publish YouTube video - loneliness/depth angle", "done": false },
+          { "id": "w5o3", "text": "Analyze Recalibration Assessment initial data", "done": false }
+        ],
+        "reflections": ""
+      },
+      {
+        "weekNumber": 6,
+        "startDate": "2026-03-24",
+        "theme": "Preparing for the Wrong Future",
+        "objectives": [
+          { "id": "w6o1", "text": "Write and publish LinkedIn post - preparing for wrong future angle", "done": false },
+          { "id": "w6o2", "text": "Record and publish YouTube video - preparing for wrong future angle", "done": false },
+          { "id": "w6o3", "text": "Mid-sprint review: what's working, what's not, what to adjust", "done": false }
+        ],
+        "reflections": ""
+      },
+      {
+        "weekNumber": 7,
+        "startDate": "2026-03-31",
+        "theme": "AI as Mirror of Humanity",
+        "objectives": [
+          { "id": "w7o1", "text": "Write and publish LinkedIn post - AI as mirror angle", "done": false },
+          { "id": "w7o2", "text": "Record and publish YouTube video - AI as mirror angle", "done": false },
+          { "id": "w7o3", "text": "Review all content performance data so far", "done": false }
+        ],
+        "reflections": ""
+      },
+      {
+        "weekNumber": 8,
+        "startDate": "2026-04-07",
+        "theme": "Based on Audience Signal (TBD)",
+        "objectives": [
+          { "id": "w8o1", "text": "Create content based on strongest performing angle from weeks 1-7", "done": false },
+          { "id": "w8o2", "text": "Decide: double down on top 2-3 angles", "done": false }
+        ],
+        "reflections": ""
+      },
+      { "weekNumber": 9, "startDate": "2026-04-14", "theme": "Based on Audience Signal (TBD)", "objectives": [], "reflections": "" },
+      { "weekNumber": 10, "startDate": "2026-04-21", "theme": "Based on Audience Signal (TBD)", "objectives": [], "reflections": "" },
+      { "weekNumber": 11, "startDate": "2026-04-28", "theme": "Based on Audience Signal (TBD)", "objectives": [], "reflections": "" },
+      {
+        "weekNumber": 12,
+        "startDate": "2026-05-05",
+        "theme": "Sprint Review and Recalibration",
+        "objectives": [
+          { "id": "w12o1", "text": "Full sprint retrospective: what worked, what didn't", "done": false },
+          { "id": "w12o2", "text": "Audience analysis: who showed up, what do they care about", "done": false },
+          { "id": "w12o3", "text": "Revenue readiness assessment: is paid community viable?", "done": false },
+          { "id": "w12o4", "text": "Design Sprint 2 based on all learnings", "done": false }
+        ],
+        "reflections": ""
+      },
+      { "weekNumber": 13, "startDate": "2026-05-12", "theme": "Buffer / Transition Week", "objectives": [], "reflections": "" }
+    ]
+  },
+  "pastSprints": [],
+  "lastModified": "2026-02-15T00:00:00.000Z"
+}

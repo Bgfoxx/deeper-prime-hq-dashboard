@@ -1,0 +1,45 @@
+{
+  "platforms": {
+    "linkedin": {
+      "name": "LinkedIn",
+      "entries": [
+        { "date": "2026-02-17", "followers": 3400, "postViews": null, "postEngagement": null, "notes": "Starting point" }
+      ]
+    },
+    "youtube": {
+      "name": "YouTube",
+      "entries": [
+        { "date": "2026-02-17", "subscribers": 5000, "views": null, "avgViewDuration": null, "notes": "Starting point - low engagement, 50-150 views per video" }
+      ]
+    },
+    "instagram": {
+      "name": "Instagram",
+      "entries": [
+        { "date": "2026-02-17", "followers": 1000, "notes": "Starting point" }
+      ]
+    },
+    "email": {
+      "name": "Email List",
+      "entries": [
+        { "date": "2026-02-17", "subscribers": 400, "openRate": null, "notes": "Dormant for 1+ year, reactivation pending" }
+      ]
+    },
+    "whatsapp": {
+      "name": "WhatsApp Community",
+      "entries": [
+        { "date": "2026-02-17", "members": 60, "activeMembersEstimate": 20, "notes": "Starting point" }
+      ]
+    },
+    "twitter": {
+      "name": "X/Twitter",
+      "entries": [
+        { "date": "2026-02-17", "followers": null, "notes": "Minimal presence" }
+      ]
+    },
+    "assessment": {
+      "name": "Recalibration Assessment",
+      "entries": []
+    }
+  },
+  "lastModified": "2026-02-15T00:00:00.000Z"
+}
