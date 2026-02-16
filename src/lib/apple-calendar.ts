@@ -23,19 +23,37 @@ interface CalendarCache {
 
 const CACHE_FILE = "calendar-cache.json";
 
-// Cache the icalBuddy availability check for the lifetime of the process
-let icalBuddyAvailable: boolean | null = null;
+// Common paths where icalBuddy may be installed
+const ICAL_BUDDY_PATHS = [
+  "/opt/homebrew/bin/icalBuddy",
+  "/usr/local/bin/icalBuddy",
+];
+
+// Cache the resolved path for the lifetime of the process
+let icalBuddyPath: string | false | null = null;
 
 export async function isIcalBuddyAvailable(): Promise<boolean> {
-  if (icalBuddyAvailable !== null) return icalBuddyAvailable;
+  if (icalBuddyPath !== null) return icalBuddyPath !== false;
 
-  try {
-    await execFileAsync("which", ["icalBuddy"]);
-    icalBuddyAvailable = true;
-  } catch {
-    icalBuddyAvailable = false;
+  for (const p of ICAL_BUDDY_PATHS) {
+    try {
+      await execFileAsync(p, ["--version"]);
+      icalBuddyPath = p;
+      return true;
+    } catch {
+      // Try next path
+    }
   }
-  return icalBuddyAvailable;
+
+  // Fallback: try bare command in case it's on PATH
+  try {
+    await execFileAsync("icalBuddy", ["--version"]);
+    icalBuddyPath = "icalBuddy";
+    return true;
+  } catch {
+    icalBuddyPath = false;
+    return false;
+  }
 }
 
 /**
@@ -61,7 +79,7 @@ export async function fetchAppleEvents(
   const endStr = endDate.split("T")[0];
 
   try {
-    const { stdout } = await execFileAsync("icalBuddy", [
+    const { stdout, stderr } = await execFileAsync(icalBuddyPath as string, [
       "-nrd",
       "-b", "",
       "-df", "%Y-%m-%dT%H:%M:%S",
@@ -69,8 +87,12 @@ export async function fetchAppleEvents(
       `eventsFrom:${startStr}`, `to:${endStr}`,
     ], { timeout: 10000 });
 
-    return parseOutput(stdout);
-  } catch {
+    if (stderr) console.error("[icalBuddy stderr]", stderr);
+    const events = parseOutput(stdout);
+    console.log(`[icalBuddy] Fetched ${events.length} events for ${startStr} to ${endStr}`);
+    return events;
+  } catch (err) {
+    console.error("[icalBuddy] Failed to fetch events:", err);
     return [];
   }
 }
@@ -83,30 +105,51 @@ function parseOutput(stdout: string): CalendarEvent[] {
   const lines = stdout.split("\n");
   let i = 0;
 
+  // Helper: check if a line is indented (part of an event's properties)
+  const isIndented = (line: string) =>
+    line.startsWith("    ") || line.startsWith("\t") || line.startsWith("           ");
+
   while (i < lines.length) {
     const line = lines[i].trimEnd();
 
-    // Skip empty lines
+    // Skip empty lines between events
     if (!line.trim()) {
       i++;
       continue;
     }
 
-    // Title line: not indented, may have bullet, contains calendar name in parens
+    // Title line: not deeply indented (may have 1 leading space from icalBuddy)
     if (!line.startsWith("    ") && !line.startsWith("\t")) {
-      const titleMatch = line.match(/^(?:•\s*)?(.+?)\s*\(([^)]+)\)\s*$/);
-      const title = titleMatch ? titleMatch[1].trim() : line.replace(/^•\s*/, "").trim();
-      const calendar = titleMatch ? titleMatch[2] : "";
+      // Extract calendar name from the LAST parenthesized group
+      const calMatch = line.match(/^(?:•\s*)?\s*(.+)\s+\(([^)]+)\)\s*$/);
+      const title = calMatch ? calMatch[1].trim() : line.replace(/^•\s*/, "").trim();
+      const calendar = calMatch ? calMatch[2] : "";
 
       let location = "";
       let start = "";
       let end = "";
       let allDay = false;
 
-      // Read indented property lines
+      // Read indented property lines — allow blank lines within the block
       i++;
-      while (i < lines.length && (lines[i].startsWith("    ") || lines[i].startsWith("\t"))) {
-        const prop = lines[i].trim();
+      while (i < lines.length) {
+        const raw = lines[i];
+        const trimmed = raw.trimEnd();
+
+        // Blank line: peek ahead to see if the next non-blank line is still indented
+        if (!trimmed.trim()) {
+          let j = i + 1;
+          while (j < lines.length && !lines[j].trim()) j++;
+          if (j < lines.length && isIndented(lines[j])) {
+            i++;
+            continue; // blank line within the event block, skip it
+          }
+          break; // blank line followed by non-indented = end of event
+        }
+
+        if (!isIndented(trimmed)) break; // next event title
+
+        const prop = trimmed.trim();
 
         if (prop.startsWith("location:")) {
           location = prop.replace("location:", "").trim();
@@ -115,9 +158,9 @@ function parseOutput(stdout: string): CalendarEvent[] {
           prop.startsWith("notes:") ||
           prop.startsWith("attendees:")
         ) {
-          // Skip
-        } else if (prop.match(/\d{4}-\d{2}-\d{2}/)) {
-          // Date/time line — try various formats icalBuddy may produce
+          // Skip known metadata lines (and their continuations handled by indent)
+        } else if (prop.match(/^\d{4}-\d{2}-\d{2}/)) {
+          // Date/time line — must START with a date to avoid matching dates in notes
           // Format 1: "2026-02-16T09:00:00 at 09:00 - 2026-02-16T10:00:00 at 10:00"
           const fullMatch = prop.match(
             /(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\s+at\s+\d{2}:\d{2}\s*-\s*(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})\s+at\s+\d{2}:\d{2}/
@@ -135,7 +178,7 @@ function parseOutput(stdout: string): CalendarEvent[] {
               end = start.split("T")[0] + "T" + sameDayMatch[2] + ":00";
             } else {
               // Format 3: all-day — just a date like "2026-02-16T00:00:00"
-              const allDayMatch = prop.match(/(\d{4}-\d{2}-\d{2})/);
+              const allDayMatch = prop.match(/^(\d{4}-\d{2}-\d{2})/);
               if (allDayMatch) {
                 start = allDayMatch[1];
                 end = allDayMatch[1];
@@ -144,6 +187,7 @@ function parseOutput(stdout: string): CalendarEvent[] {
             }
           }
         }
+        // else: continuation of notes/attendees — ignore
         i++;
       }
 

@@ -114,7 +114,7 @@ function CalendarContent() {
   };
 
   const dayNames = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const hours = Array.from({ length: 14 }, (_, i) => i + 7); // 7am to 8pm
+  const hours = Array.from({ length: 18 }, (_, i) => i + 6); // 6am to 11pm
 
   const getTasksForDate = (dateStr: string) =>
     tasks.filter((t) => t.date === dateStr);

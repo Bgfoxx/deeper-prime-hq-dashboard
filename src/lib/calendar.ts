@@ -20,15 +20,7 @@ export async function fetchCalendarEvents(
   timeMin: string,
   timeMax: string
 ): Promise<CalendarEvent[]> {
-  // 1. Try Apple Calendar via icalBuddy
-  if (await isIcalBuddyAvailable()) {
-    const events = await fetchAppleEvents(timeMin, timeMax);
-    // Update cache for the OpenClaw Mac (fire-and-forget is fine)
-    updateCache(events).catch(() => {});
-    if (events.length > 0) return events;
-  }
-
-  // 2. Try cached events
+  // 1. Try cached events (populated by scripts/sync-calendar.sh which has Calendar permissions)
   try {
     const cache = await readCache();
     if (cache.events && cache.events.length > 0) {
