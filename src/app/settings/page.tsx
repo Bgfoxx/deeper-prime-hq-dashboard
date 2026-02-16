@@ -8,7 +8,7 @@ import { toast } from "sonner";
 
 export default function SettingsPage() {
   const { sprint, loading, updateSprint } = useSprint();
-  const { connected: calendarConnected, loading: calendarLoading, refetch: refetchCalendar } = useCalendarStatus();
+  const { connected: calendarConnected, source: calendarSource, cachedAt, loading: calendarLoading, refetch: refetchCalendar } = useCalendarStatus();
   const [sprintName, setSprintName] = useState("");
   const [sprintStart, setSprintStart] = useState("");
   const [sprintEnd, setSprintEnd] = useState("");
@@ -136,13 +136,30 @@ export default function SettingsPage() {
           <h2 className="font-heading text-lg">Calendar Connection</h2>
         </div>
         <p className="text-sm text-text-secondary mb-3">
-          Connect your Google Calendar to overlay events with your Deeper Prime tasks.
+          Calendar events are shown on the Calendar page and in daily agenda messages.
         </p>
         {calendarLoading ? (
           <Skeleton className="h-9 w-48" />
+        ) : calendarSource === "apple" ? (
+          <div className="space-y-2">
+            <div className="flex items-center gap-3">
+              <Badge color="success">Apple Calendar</Badge>
+              {cachedAt && (
+                <span className="text-xs text-text-secondary">
+                  Last synced: {new Date(cachedAt).toLocaleString("en-US", { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}
+                </span>
+              )}
+              {!cachedAt && (
+                <span className="text-xs text-text-secondary">Reading directly via icalBuddy</span>
+              )}
+            </div>
+            <p className="text-xs text-text-secondary">
+              Events are read from Apple Calendar automatically on each page load. The cache syncs to other machines via Syncthing.
+            </p>
+          </div>
         ) : calendarConnected ? (
           <div className="flex items-center gap-3">
-            <Badge color="success">Connected</Badge>
+            <Badge color="success">Google Calendar</Badge>
             <Button
               variant="ghost"
               size="sm"
@@ -160,24 +177,29 @@ export default function SettingsPage() {
             </Button>
           </div>
         ) : (
-          <Button
-            variant="secondary"
-            onClick={async () => {
-              try {
-                const res = await fetch("/api/calendar/auth");
-                const data = await res.json();
-                if (data.url) {
-                  window.location.href = data.url;
-                } else {
-                  toast.error(data.error ?? "Failed to start connection");
+          <div className="space-y-2">
+            <p className="text-xs text-text-secondary">
+              Install icalBuddy (<code className="text-text-primary">brew install ical-buddy</code>) to read from Apple Calendar, or connect Google Calendar below.
+            </p>
+            <Button
+              variant="secondary"
+              onClick={async () => {
+                try {
+                  const res = await fetch("/api/calendar/auth");
+                  const data = await res.json();
+                  if (data.url) {
+                    window.location.href = data.url;
+                  } else {
+                    toast.error(data.error ?? "Failed to start connection");
+                  }
+                } catch {
+                  toast.error("Failed to connect — check that Google credentials are configured");
                 }
-              } catch {
-                toast.error("Failed to connect — check that Google credentials are configured");
-              }
-            }}
-          >
-            Connect Google Calendar
-          </Button>
+              }}
+            >
+              Connect Google Calendar
+            </Button>
+          </div>
         )}
       </Card>
 

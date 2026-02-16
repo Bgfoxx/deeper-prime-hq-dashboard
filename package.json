@@ -5,13 +5,19 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "pm2:start": "npm run build && npx pm2 start ecosystem.config.js",
+    "pm2:stop": "npx pm2 stop deeper-prime-hq",
+    "pm2:restart": "npm run build && npx pm2 restart deeper-prime-hq",
+    "pm2:logs": "npx pm2 logs deeper-prime-hq",
+    "pm2:status": "npx pm2 status"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
     "googleapis": "^171.4.0",
     "lucide-react": "^0.564.0",
     "next": "16.1.6",
+    "pm2": "^6.0.14",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-markdown": "^10.1.0",

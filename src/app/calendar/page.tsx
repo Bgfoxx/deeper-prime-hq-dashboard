@@ -17,7 +17,7 @@ export default function CalendarPage() {
 
 function CalendarContent() {
   const { tasks, loading: tasksLoading } = useTasks();
-  const { connected, loading: statusLoading, refetch: refetchStatus } = useCalendarStatus();
+  const { connected, source, cachedAt, loading: statusLoading, refetch: refetchStatus } = useCalendarStatus();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState<"week" | "day">("week");
   const searchParams = useSearchParams();
@@ -71,8 +71,8 @@ function CalendarContent() {
   }, [view, weekDates, currentDate]);
 
   const { events: calendarEvents, loading: eventsLoading } = useCalendar(
-    connected ? dateRange.start : "",
-    connected ? dateRange.end : ""
+    dateRange.start,
+    dateRange.end
   );
 
   const today = new Date().toISOString().split("T")[0];
@@ -177,10 +177,10 @@ function CalendarContent() {
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-3xl">Calendar</h1>
         <div className="flex items-center gap-3">
-          {connected && (
+          {source === "google" && (
             <Button variant="ghost" size="sm" onClick={handleDisconnect}>
               <span className="flex items-center gap-1.5">
-                <Unlink size={14} /> Disconnect
+                <Unlink size={14} /> Disconnect Google
               </span>
             </Button>
           )}
@@ -201,21 +201,38 @@ function CalendarContent() {
         </div>
       </div>
 
-      {/* Google Calendar Connection Banner */}
+      {/* Calendar Connection Status */}
+      {connected && source === "apple" && (
+        <Card className="!p-4 border-success/20 bg-success/5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CalendarIcon size={18} className="text-success" />
+              <div>
+                <p className="text-sm font-medium">Apple Calendar connected</p>
+                <p className="text-xs text-text-secondary">
+                  {cachedAt
+                    ? `Last synced: ${new Date(cachedAt).toLocaleString("en-US", { hour: "numeric", minute: "2-digit", month: "short", day: "numeric" })}`
+                    : "Reading directly from Calendar.app"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
       {!connected && (
         <Card className="!p-4 border-accent/20 bg-accent/5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link2 size={18} className="text-accent" />
               <div>
-                <p className="text-sm font-medium">Google Calendar not connected</p>
+                <p className="text-sm font-medium">No calendar connected</p>
                 <p className="text-xs text-text-secondary">
-                  Connect your Google Calendar to see events alongside your tasks
+                  Install icalBuddy to read from Apple Calendar, or connect Google Calendar
                 </p>
               </div>
             </div>
             <Button variant="secondary" size="sm" onClick={handleConnect}>
-              Connect Calendar
+              Connect Google Calendar
             </Button>
           </div>
         </Card>
@@ -246,7 +263,7 @@ function CalendarContent() {
                   year: "numeric",
                 })}
           </h2>
-          {eventsLoading && connected && (
+          {eventsLoading && (
             <span className="text-xs text-text-secondary ml-2">Loading events...</span>
           )}
         </div>
@@ -283,7 +300,7 @@ function CalendarContent() {
           </div>
 
           {/* All-day events row (Google Calendar) */}
-          {connected && calendarEvents.some((e) => e.allDay) && (
+          {calendarEvents.some((e) => e.allDay) && (
             <div className="grid grid-cols-8 border-b border-border min-h-[32px]">
               <div className="p-2 text-xs text-text-secondary flex items-start justify-end pr-3">
                 All Day
@@ -346,7 +363,7 @@ function CalendarContent() {
               </div>
               {weekDates.map((date, i) => {
                 const dateStr = date.toISOString().split("T")[0];
-                const hourEvents = connected ? getEventsForHour(dateStr, hour) : [];
+                const hourEvents = getEventsForHour(dateStr, hour);
                 return (
                   <div key={i} className="border-l border-border/50 relative">
                     {hourEvents.map((event) => (
@@ -369,7 +386,7 @@ function CalendarContent() {
         /* Day View */
         <Card className="!p-0 overflow-hidden">
           {/* All-day Google events */}
-          {connected && getAllDayEvents(currentDate.toISOString().split("T")[0]).length > 0 && (
+          {getAllDayEvents(currentDate.toISOString().split("T")[0]).length > 0 && (
             <div className="p-4 border-b border-border">
               <p className="text-xs text-text-secondary uppercase tracking-wider mb-2">All Day</p>
               <div className="space-y-1">
@@ -416,7 +433,7 @@ function CalendarContent() {
           {/* Hour grid */}
           {hours.map((hour) => {
             const dateStr = currentDate.toISOString().split("T")[0];
-            const hourEvents = connected ? getEventsForHour(dateStr, hour) : [];
+            const hourEvents = getEventsForHour(dateStr, hour);
             return (
               <div key={hour} className="flex border-b border-border/50 min-h-[50px]">
                 <div className="w-16 p-2 text-xs font-mono text-text-secondary text-right pr-3 flex-shrink-0">

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { readJsonFile, mergeAndWrite } from "@/lib/data";
-import { fetchEvents } from "@/lib/google-calendar";
+import { fetchCalendarEvents } from "@/lib/calendar";
 import { randomUUID } from "crypto";
 
 interface Task {
@@ -117,7 +117,7 @@ export async function POST() {
   try {
     const dayStart = `${today}T00:00:00.000Z`;
     const dayEnd = `${today}T23:59:59.999Z`;
-    events = await fetchEvents(dayStart, dayEnd);
+    events = await fetchCalendarEvents(dayStart, dayEnd);
   } catch {
     // Calendar not connected
   }

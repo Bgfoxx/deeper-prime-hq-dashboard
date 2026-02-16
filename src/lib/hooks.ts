@@ -371,8 +371,18 @@ export interface CalendarEvent {
 }
 
 export function useCalendarStatus() {
-  const { data, loading, refetch } = useData<{ connected: boolean }>("/api/calendar/status");
-  return { connected: data?.connected ?? false, loading, refetch };
+  const { data, loading, refetch } = useData<{
+    connected: boolean;
+    source: "apple" | "google" | "none";
+    cachedAt?: string;
+  }>("/api/calendar/status");
+  return {
+    connected: data?.connected ?? false,
+    source: data?.source ?? "none",
+    cachedAt: data?.cachedAt,
+    loading,
+    refetch,
+  };
 }
 
 export function useCalendar(start: string, end: string) {

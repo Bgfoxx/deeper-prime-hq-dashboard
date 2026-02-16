@@ -30,6 +30,7 @@ const defaults: Record<string, unknown> = {
   "analytics.json": { platforms: {}, lastModified: new Date().toISOString() },
   "docs-registry.json": { docs: [], lastModified: new Date().toISOString() },
   "agenda.json": { entries: [], lastModified: new Date().toISOString() },
+  "calendar-cache.json": { events: [], fetchedAt: "", lastModified: new Date().toISOString() },
 };
 
 export async function readJsonFile<T>(filename: string): Promise<T> {

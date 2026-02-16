@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { loadTokens } from "@/lib/google-calendar";
+import { getCalendarStatus } from "@/lib/calendar";
 
 export async function GET() {
-  const tokens = await loadTokens();
-  return NextResponse.json({ connected: !!tokens });
+  const status = await getCalendarStatus();
+  return NextResponse.json(status);
 }
