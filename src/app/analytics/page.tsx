@@ -1,6 +1,6 @@
 "use client";
 
-import { useAnalytics } from "@/lib/hooks";
+import { useAnalytics, localToday } from "@/lib/hooks";
 import { Card, Badge, Button, Input, Skeleton, EmptyState } from "@/components/ui";
 import { BarChart3, TrendingUp, TrendingDown, Minus, Plus } from "lucide-react";
 import { useState } from "react";
@@ -27,7 +27,7 @@ export default function AnalyticsPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [newEntries, setNewEntries] = useState<Record<string, Record<string, string>>>({});
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = localToday();
 
   const getLatestValue = (platformKey: string): number | null => {
     const platform = platforms[platformKey];

@@ -1,6 +1,6 @@
 "use client";
 
-import { useSprint, useTasks, useContent, useKanban, useMemory } from "@/lib/hooks";
+import { useSprint, useTasks, useContent, useKanban, useMemory, localToday } from "@/lib/hooks";
 import { Card, Badge, Button, ProgressBar, Skeleton } from "@/components/ui";
 import { Plus, Target, CheckSquare, Bot, Newspaper, BookOpen } from "lucide-react";
 import Link from "next/link";
@@ -12,7 +12,7 @@ export default function Dashboard() {
   const { columns, loading: kanbanLoading } = useKanban();
   const { entries: memoryEntries, loading: memoryLoading } = useMemory();
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = localToday();
   const todayTasks = tasks.filter((t) => t.date === today && t.status !== "done");
   const completedToday = tasks.filter((t) => t.date === today && t.status === "done");
 

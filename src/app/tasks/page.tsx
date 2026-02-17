@@ -1,8 +1,8 @@
 "use client";
 
-import { useTasks, Task } from "@/lib/hooks";
+import { useTasks, Task, localToday } from "@/lib/hooks";
 import { Card, Badge, Button, Input, Select, Skeleton, EmptyState } from "@/components/ui";
-import { Plus, CheckSquare, ChevronDown, Trash2 } from "lucide-react";
+import { Plus, CheckSquare, ChevronDown, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -15,21 +15,22 @@ export default function TasksPage() {
   const [showCompleted, setShowCompleted] = useState(false);
   const [filterCategory, setFilterCategory] = useState("all");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [weekOffset, setWeekOffset] = useState(0);
   const [newTask, setNewTask] = useState({
     title: "",
     priority: "medium" as Task["priority"],
     category: "deeper-prime",
-    date: new Date().toISOString().split("T")[0],
+    date: localToday(),
   });
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = localToday();
 
-  // Get date range for this week
-  const getWeekDates = () => {
+  // Get date range for a week (offset 0 = current week)
+  const getWeekDates = (offset: number = 0) => {
     const now = new Date();
     const dayOfWeek = now.getDay();
     const monday = new Date(now);
-    monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1) + offset * 7);
     const sunday = new Date(monday);
     sunday.setDate(monday.getDate() + 6);
     return {
@@ -38,12 +39,20 @@ export default function TasksPage() {
     };
   };
 
-  const weekRange = getWeekDates();
+  const weekRange = getWeekDates(weekOffset);
+
+  const formatWeekLabel = () => {
+    const fmt = (d: string) => {
+      const date = new Date(d + "T00:00:00");
+      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    };
+    return `${fmt(weekRange.start)} – ${fmt(weekRange.end)}`;
+  };
 
   // Filter tasks
   let filteredTasks = tasks;
   if (view === "today") {
-    filteredTasks = tasks.filter((t) => t.date === today);
+    filteredTasks = tasks.filter((t) => t.date === today || (t.date < today && t.status !== "done"));
   } else {
     filteredTasks = tasks.filter((t) => t.date >= weekRange.start && t.date <= weekRange.end);
   }
@@ -88,7 +97,7 @@ export default function TasksPage() {
       title: "",
       priority: "medium",
       category: "deeper-prime",
-      date: new Date().toISOString().split("T")[0],
+      date: localToday(),
     });
     setShowAddForm(false);
     toast.success("Task added");
@@ -168,7 +177,7 @@ export default function TasksPage() {
             Today
           </button>
           <button
-            onClick={() => setView("week")}
+            onClick={() => { setView("week"); setWeekOffset(0); }}
             className={`px-4 py-2 text-sm transition-colors ${
               view === "week" ? "bg-accent text-white" : "text-text-secondary hover:text-text-primary"
             }`}
@@ -176,6 +185,34 @@ export default function TasksPage() {
             This Week
           </button>
         </div>
+
+        {view === "week" && (
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setWeekOffset(weekOffset - 1)}
+              className="p-1.5 rounded hover:bg-surface text-text-secondary hover:text-text-primary transition-colors"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <span className="text-xs font-mono text-text-secondary min-w-[130px] text-center">
+              {formatWeekLabel()}
+            </span>
+            <button
+              onClick={() => setWeekOffset(weekOffset + 1)}
+              className="p-1.5 rounded hover:bg-surface text-text-secondary hover:text-text-primary transition-colors"
+            >
+              <ChevronRight size={16} />
+            </button>
+            {weekOffset !== 0 && (
+              <button
+                onClick={() => setWeekOffset(0)}
+                className="text-xs text-accent hover:text-accent-hover ml-1 transition-colors"
+              >
+                Today
+              </button>
+            )}
+          </div>
+        )}
 
         <div className="flex gap-1">
           <button

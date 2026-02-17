@@ -2,6 +2,12 @@
 
 import { useState, useEffect, useCallback } from "react";
 
+/** Returns today's date as YYYY-MM-DD in the local timezone. */
+export function localToday(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 function useData<T>(url: string) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useTasks, useCalendar, useCalendarStatus, CalendarEvent } from "@/lib/hooks";
+import { useTasks, useCalendar, useCalendarStatus, CalendarEvent, localToday } from "@/lib/hooks";
 import { Card, Badge, Button, Skeleton } from "@/components/ui";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Link2, Unlink, MapPin } from "lucide-react";
 import { useState, useMemo, useEffect, Suspense } from "react";
@@ -75,7 +75,7 @@ function CalendarContent() {
     dateRange.end
   );
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = localToday();
 
   const navigateWeek = (direction: number) => {
     const next = new Date(currentDate);

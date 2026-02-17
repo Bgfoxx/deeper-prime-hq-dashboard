@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemory, MemoryEntry } from "@/lib/hooks";
+import { useMemory, MemoryEntry, localToday } from "@/lib/hooks";
 import { Card, Badge, Button, Input, Textarea, Select, Skeleton, EmptyState } from "@/components/ui";
 import { BookOpen, Plus, Search, X } from "lucide-react";
 import { useState, useMemo } from "react";
@@ -41,7 +41,7 @@ export default function MemoryLog() {
     tags: [] as string[],
   });
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = localToday();
 
   // Filter and sort entries
   const filteredEntries = useMemo(() => {
