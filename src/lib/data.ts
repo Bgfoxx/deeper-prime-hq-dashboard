@@ -23,6 +23,7 @@ const defaults: Record<string, unknown> = {
       { id: "done", title: "Done", cards: [] },
     ],
     archive: [],
+    labels: ["research", "tool-building", "content", "admin"],
     lastModified: new Date().toISOString(),
   },
   "content-pipeline.json": { content: [], archive: [], angles: [], lastModified: new Date().toISOString() },

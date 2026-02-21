@@ -1,8 +1,8 @@
 "use client";
 
-import { useSprint, useCalendarStatus, useContent } from "@/lib/hooks";
+import { useSprint, useCalendarStatus, useContent, useKanban } from "@/lib/hooks";
 import { Card, Badge, Button, Input, Skeleton } from "@/components/ui";
-import { Settings as SettingsIcon, Download, RotateCcw, Calendar, Palette, Plus, Trash2, Check, X } from "lucide-react";
+import { Settings as SettingsIcon, Download, RotateCcw, Calendar, Palette, Plus, Trash2, Check, X, Tag } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -16,11 +16,15 @@ export default function SettingsPage() {
   const { sprint, loading, updateSprint } = useSprint();
   const { connected: calendarConnected, source: calendarSource, cachedAt, loading: calendarLoading, refetch: refetchCalendar } = useCalendarStatus();
   const { angles, loading: anglesLoading, addAngle, updateAngle, deleteAngle } = useContent();
+  const { labels, addLabel, deleteLabel } = useKanban();
 
   const [sprintName, setSprintName] = useState("");
   const [sprintStart, setSprintStart] = useState("");
   const [sprintEnd, setSprintEnd] = useState("");
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  // Label management state
+  const [newLabelName, setNewLabelName] = useState("");
 
   // Angle management state
   const [newAngleName, setNewAngleName] = useState("");
@@ -241,6 +245,58 @@ export default function SettingsPage() {
                 addAngle(newAngleName.trim(), newAngleColor)
                   .then(() => { setNewAngleName(""); toast.success("Angle added"); })
                   .catch(() => toast.error("Failed to add angle"));
+              }}
+            >
+              <span className="flex items-center gap-1"><Plus size={14} /> Add</span>
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Kanban Labels */}
+      <Card>
+        <div className="flex items-center gap-2 mb-4">
+          <Tag size={18} className="text-accent" />
+          <h2 className="font-heading text-lg">Apollo Board Labels</h2>
+        </div>
+        <p className="text-xs text-text-secondary mb-4">
+          Labels used to tag cards on the Apollo Board.
+        </p>
+        <div className="space-y-2 mb-4">
+          {labels.length === 0 && (
+            <p className="text-xs text-text-secondary py-2">No labels yet.</p>
+          )}
+          {labels.map((label) => (
+            <div key={label} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+              <span className="text-sm font-mono">{label}</span>
+              <button
+                onClick={() =>
+                  deleteLabel(label)
+                    .then(() => toast.success("Label deleted"))
+                    .catch(() => toast.error("Failed to delete"))
+                }
+                className="p-1 text-text-secondary hover:text-danger transition-colors"
+              >
+                <Trash2 size={13} />
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="pt-3 border-t border-border">
+          <p className="text-xs text-text-secondary uppercase tracking-wider mb-2">Add Label</p>
+          <div className="flex gap-2">
+            <Input
+              value={newLabelName}
+              onChange={setNewLabelName}
+              placeholder="Label name..."
+              className="flex-1"
+            />
+            <Button
+              onClick={() => {
+                if (!newLabelName.trim()) return;
+                addLabel(newLabelName.trim())
+                  .then(() => { setNewLabelName(""); toast.success("Label added"); })
+                  .catch(() => toast.error("Failed to add label"));
               }}
             >
               <span className="flex items-center gap-1"><Plus size={14} /> Add</span>

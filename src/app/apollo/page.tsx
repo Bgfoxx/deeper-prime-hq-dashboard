@@ -6,7 +6,6 @@ import { Bot, Plus, X, Archive, GripVertical, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const labelOptions = ["research", "tool-building", "content", "admin"];
 const priorityOptions = ["high", "medium", "low"];
 const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
 const DONE_CAP = 6;
@@ -19,7 +18,7 @@ const columnColors: Record<string, string> = {
 };
 
 export default function ApolloBoard() {
-  const { columns, archive, loading, addCard, updateCard, moveCard, archiveCard, restoreCard } = useKanban();
+  const { columns, archive, labels: labelOptions, loading, addCard, updateCard, moveCard, archiveCard, restoreCard } = useKanban();
   const [viewMode, setViewMode] = useState<"board" | "archive">("board");
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [editingCard, setEditingCard] = useState<KanbanCard | null>(null);
@@ -311,6 +310,31 @@ export default function ApolloBoard() {
                 options={priorityOptions.map((p) => ({ value: p, label: p }))}
               />
               <div>
+                <p className="text-xs text-text-secondary mb-2">Labels</p>
+                <div className="flex flex-wrap gap-1">
+                  {labelOptions.map((label) => (
+                    <button
+                      key={label}
+                      onClick={() =>
+                        setEditingCard({
+                          ...editingCard,
+                          labels: editingCard.labels.includes(label)
+                            ? editingCard.labels.filter((l) => l !== label)
+                            : [...editingCard.labels, label],
+                        })
+                      }
+                      className={`px-2 py-0.5 text-xs rounded-full border transition-colors ${
+                        editingCard.labels.includes(label)
+                          ? "border-accent text-accent bg-accent/10"
+                          : "border-border text-text-secondary"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
                 <p className="text-xs text-text-secondary mb-1">Apollo Notes</p>
                 <Textarea
                   value={editingCard.apolloNotes}
@@ -328,6 +352,7 @@ export default function ApolloBoard() {
                       title: editingCard.title,
                       description: editingCard.description,
                       priority: editingCard.priority,
+                      labels: editingCard.labels,
                       apolloNotes: editingCard.apolloNotes,
                     });
                     setEditingCard(null);

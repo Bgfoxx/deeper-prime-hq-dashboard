@@ -148,6 +148,7 @@ export interface KanbanColumn {
 interface KanbanData {
   columns: KanbanColumn[];
   archive: KanbanCard[];
+  labels: string[];
   lastModified: string;
 }
 
@@ -202,9 +203,30 @@ export function useKanban() {
     await refetch();
   };
 
+  const addLabel = async (label: string) => {
+    const res = await fetch("/api/kanban", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "add-label", label }),
+    });
+    if (!res.ok) throw new Error("Failed to add label");
+    await refetch();
+  };
+
+  const deleteLabel = async (label: string) => {
+    const res = await fetch("/api/kanban", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete-label", label }),
+    });
+    if (!res.ok) throw new Error("Failed to delete label");
+    await refetch();
+  };
+
   return {
     columns: data?.columns ?? [],
     archive: data?.archive ?? [],
+    labels: data?.labels ?? ["research", "tool-building", "content", "admin"],
     loading,
     error,
     refetch,
@@ -213,6 +235,8 @@ export function useKanban() {
     moveCard,
     archiveCard,
     restoreCard,
+    addLabel,
+    deleteLabel,
   };
 }
 

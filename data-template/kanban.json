@@ -71,5 +71,6 @@
     { "id": "done", "title": "Done", "cards": [] }
   ],
   "archive": [],
+  "labels": ["research", "tool-building", "content", "admin"],
   "lastModified": "2026-02-15T00:00:00.000Z"
 }

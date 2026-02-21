@@ -22,11 +22,16 @@ interface Column {
 interface KanbanData {
   columns: Column[];
   archive: Card[];
+  labels: string[];
   lastModified: string;
 }
 
 export async function GET() {
   const data = await readJsonFile<KanbanData>("kanban.json");
+  // Seed labels if missing from live file
+  if (!data.labels || data.labels.length === 0) {
+    data.labels = DEFAULT_LABELS;
+  }
   return NextResponse.json(data);
 }
 
@@ -57,6 +62,7 @@ export async function POST(request: Request) {
 }
 
 const DONE_CAP = 6;
+const DEFAULT_LABELS = ["research", "tool-building", "content", "admin"];
 
 export async function PUT(request: Request) {
   const body = await request.json();
@@ -88,6 +94,25 @@ export async function PUT(request: Request) {
 
       return { ...current, columns: cols, archive };
     });
+    return NextResponse.json(result);
+  }
+
+  // Label management
+  if (body.action === "add-label") {
+    const label = (body.label as string).trim().toLowerCase();
+    const result = await mergeAndWrite<KanbanData>("kanban.json", (current) => {
+      const existing = current.labels ?? DEFAULT_LABELS;
+      if (existing.includes(label)) return current;
+      return { ...current, labels: [...existing, label] };
+    });
+    return NextResponse.json(result);
+  }
+
+  if (body.action === "delete-label") {
+    const result = await mergeAndWrite<KanbanData>("kanban.json", (current) => ({
+      ...current,
+      labels: (current.labels ?? DEFAULT_LABELS).filter((l) => l !== body.label),
+    }));
     return NextResponse.json(result);
   }
 
