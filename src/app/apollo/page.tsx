@@ -2,7 +2,7 @@
 
 import { useKanban, KanbanCard } from "@/lib/hooks";
 import { Card, Badge, Button, Input, Textarea, Select, Skeleton, EmptyState } from "@/components/ui";
-import { Bot, Plus, X, Archive, GripVertical } from "lucide-react";
+import { Bot, Plus, X, Archive, GripVertical, RotateCcw } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -19,7 +19,8 @@ const columnColors: Record<string, string> = {
 };
 
 export default function ApolloBoard() {
-  const { columns, loading, addCard, updateCard, moveCard, archiveCard } = useKanban();
+  const { columns, archive, loading, addCard, updateCard, moveCard, archiveCard, restoreCard } = useKanban();
+  const [viewMode, setViewMode] = useState<"board" | "archive">("board");
   const [addingTo, setAddingTo] = useState<string | null>(null);
   const [editingCard, setEditingCard] = useState<KanbanCard | null>(null);
   const [newCard, setNewCard] = useState({
@@ -64,10 +65,10 @@ export default function ApolloBoard() {
     toast.success("Card archived");
   };
 
-  const priorityDot: Record<string, string> = {
-    high: "bg-accent",
-    medium: "bg-border",
-    low: "bg-text-secondary/30",
+  const priorityBadge: Record<string, string> = {
+    high: "bg-danger/20 text-danger",
+    medium: "bg-warning/20 text-warning",
+    low: "bg-border/50 text-text-secondary",
   };
 
   if (loading && columns.length === 0) {
@@ -91,10 +92,65 @@ export default function ApolloBoard() {
           <h1 className="font-heading text-3xl">Apollo Board</h1>
           <p className="text-text-secondary text-sm mt-1">Tasks delegated to Apollo</p>
         </div>
+        <div className="flex bg-surface rounded-lg border border-border overflow-hidden">
+          {(["board", "archive"] as const).map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setViewMode(mode)}
+              className={`px-4 py-2 text-sm capitalize transition-colors flex items-center gap-1.5 ${
+                viewMode === mode ? "bg-accent text-white" : "text-text-secondary"
+              }`}
+            >
+              {mode === "archive" && <Archive size={13} />}
+              {mode === "archive" ? `Archive (${archive.length})` : "Board"}
+            </button>
+          ))}
+        </div>
       </div>
 
+      {/* Archive View */}
+      {viewMode === "archive" && (
+        <div className="space-y-2">
+          {archive.length === 0 ? (
+            <div className="text-center py-16 text-text-secondary text-sm">
+              No archived cards yet. Cards move here when manually archived or when Done exceeds 6.
+            </div>
+          ) : (
+            archive.map((card) => (
+              <div key={card.id} className="flex items-center gap-4 bg-surface border border-border rounded-lg p-4 group">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium truncate text-text-secondary">{card.title}</p>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize flex-shrink-0 ${priorityBadge[card.priority] ?? priorityBadge.medium}`}>
+                      {card.priority}
+                    </span>
+                  </div>
+                  {card.description && (
+                    <p className="text-xs text-text-secondary/60 truncate mt-0.5">{card.description}</p>
+                  )}
+                  <div className="flex gap-1 mt-1 flex-wrap">
+                    {card.labels.map((label) => (
+                      <Badge key={label} color="muted" className="!text-[10px] !px-1.5">{label}</Badge>
+                    ))}
+                  </div>
+                </div>
+                <button
+                  onClick={async () => {
+                    await restoreCard(card.id);
+                    toast.success("Restored to Done");
+                  }}
+                  className="opacity-0 group-hover:opacity-100 flex items-center gap-1 px-3 py-1.5 text-xs rounded-lg border border-border text-text-secondary hover:text-text-primary hover:border-accent/30 transition-all"
+                >
+                  <RotateCcw size={12} /> Restore
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
       {/* Kanban Columns */}
-      <div className="grid grid-cols-4 gap-4 min-h-[600px]">
+      {viewMode === "board" && <div className="grid grid-cols-4 gap-4 min-h-[600px]">
         {columns.map((col) => (
           <div
             key={col.id}
@@ -123,9 +179,11 @@ export default function ApolloBoard() {
                   <div className="flex items-start gap-2">
                     <GripVertical size={14} className="text-text-secondary/30 mt-0.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <div className={`w-1.5 h-1.5 rounded-full ${priorityDot[card.priority]}`} />
-                        <p className="text-sm font-medium truncate">{card.title}</p>
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <p className="text-sm font-medium leading-snug">{card.title}</p>
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize flex-shrink-0 ${priorityBadge[card.priority] ?? priorityBadge.medium}`}>
+                          {card.priority}
+                        </span>
                       </div>
                       {card.description && (
                         <p className="text-xs text-text-secondary line-clamp-2 mb-2">
@@ -224,7 +282,7 @@ export default function ApolloBoard() {
             )}
           </div>
         ))}
-      </div>
+      </div>}
 
       {/* Edit Card Modal */}
       {editingCard && (

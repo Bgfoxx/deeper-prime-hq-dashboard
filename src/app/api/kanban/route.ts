@@ -91,6 +91,25 @@ export async function PUT(request: Request) {
     return NextResponse.json(result);
   }
 
+  // Restore card from archive to backlog
+  if (body.action === "restore") {
+    const { cardId } = body;
+    const result = await mergeAndWrite<KanbanData>("kanban.json", (current) => {
+      const card = (current.archive || []).find((c) => c.id === cardId);
+      if (!card) return current;
+      return {
+        ...current,
+        archive: current.archive.filter((c) => c.id !== cardId),
+        columns: current.columns.map((col) =>
+          col.id === "done"
+            ? { ...col, cards: [{ ...card, updatedAt: new Date().toISOString() }, ...col.cards] }
+            : col
+        ),
+      };
+    });
+    return NextResponse.json(result);
+  }
+
   // Update card
   const { cardId, ...updates } = body;
   const result = await mergeAndWrite<KanbanData>("kanban.json", (current) => ({

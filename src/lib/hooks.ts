@@ -192,6 +192,16 @@ export function useKanban() {
     await refetch();
   };
 
+  const restoreCard = async (cardId: string) => {
+    const res = await fetch("/api/kanban", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cardId, action: "restore" }),
+    });
+    if (!res.ok) throw new Error("Failed to restore card");
+    await refetch();
+  };
+
   return {
     columns: data?.columns ?? [],
     archive: data?.archive ?? [],
@@ -202,6 +212,7 @@ export function useKanban() {
     updateCard,
     moveCard,
     archiveCard,
+    restoreCard,
   };
 }
 
