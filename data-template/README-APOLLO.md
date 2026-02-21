@@ -104,6 +104,47 @@ Daily agenda entries with Apollo's morning briefing notes.
 
 Entry fields: `id`, `date`, `apolloNotes`, `sentToTelegram`, `sentAt`, `createdAt`, `updatedAt`
 
+### ideas.json
+Shared idea capture for Ivan and Apollo.
+
+**Schema:**
+```json
+{
+  "ideas": [
+    {
+      "id": "uuid",
+      "title": "Short idea title",
+      "body": "Longer description or context",
+      "source": "ivan" | "apollo",
+      "tags": ["content", "tool"],
+      "createdAt": "ISO timestamp",
+      "updatedAt": "ISO timestamp"
+    }
+  ],
+  "archive": [],
+  "tags": ["content", "business", "personal", "tool", "strategy"],
+  "lastModified": "ISO timestamp"
+}
+```
+
+**Apollo's ideas protocol:**
+- When Ivan messages you with a new idea through Telegram, add it to `ideas.json` with `source: "apollo"`
+- Use `POST /api/ideas` with `{ title, body, tags, source: "apollo" }`, or write directly to the JSON file
+- Choose relevant tags from the `tags` array — do not invent new tags unless you also add them to the `tags` array
+- Set `title` to a concise phrase (5–10 words max); put details in `body`
+- Never delete ideas — use `PUT /api/ideas` with `{ id, action: "archive" }` to archive, or archive directly in the JSON
+- When Ivan asks you to refine or elaborate on an existing idea, update it via `PUT /api/ideas` with `{ id, body: "updated text" }`
+
+**API endpoints:**
+- `GET /api/ideas` — fetch all ideas, archive, and tags
+- `POST /api/ideas` — add new idea: `{ title, body, source, tags }`
+- `PUT /api/ideas` — update: `{ id, title?, body?, tags? }` or action-based:
+  - `{ id, action: "archive" }` — move to archive
+  - `{ id, action: "restore" }` — restore from archive
+  - `{ action: "add-tag", tag: "name" }` — add a tag
+  - `{ action: "delete-tag", tag: "name" }` — remove a tag
+- `DELETE /api/ideas?id=...` — permanently delete from archive
+
 ### docs-registry.json
 Index of shared documents stored in the `docs/` subdirectory.
 - When adding a new document: write the file to `docs/`, then add an entry to the registry

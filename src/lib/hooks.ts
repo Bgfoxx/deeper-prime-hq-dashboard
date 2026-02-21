@@ -653,6 +653,112 @@ export function useTodayAgenda() {
   };
 }
 
+// Ideas
+export interface Idea {
+  id: string;
+  title: string;
+  body: string;
+  source: "ivan" | "apollo";
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+const DEFAULT_IDEA_TAGS = ["content", "business", "personal", "tool", "strategy"];
+
+interface IdeasData {
+  ideas: Idea[];
+  archive: Idea[];
+  tags: string[];
+  lastModified: string;
+}
+
+export function useIdeas() {
+  const { data, loading, error, refetch } = useData<IdeasData>("/api/ideas");
+
+  const addIdea = async (idea: Omit<Idea, "id" | "createdAt" | "updatedAt">) => {
+    const res = await fetch("/api/ideas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(idea),
+    });
+    if (!res.ok) throw new Error("Failed to add idea");
+    await refetch();
+  };
+
+  const updateIdea = async (id: string, updates: Partial<Idea>) => {
+    const res = await fetch("/api/ideas", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, ...updates }),
+    });
+    if (!res.ok) throw new Error("Failed to update idea");
+    await refetch();
+  };
+
+  const archiveIdea = async (id: string) => {
+    const res = await fetch("/api/ideas", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "archive" }),
+    });
+    if (!res.ok) throw new Error("Failed to archive idea");
+    await refetch();
+  };
+
+  const restoreIdea = async (id: string) => {
+    const res = await fetch("/api/ideas", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "restore" }),
+    });
+    if (!res.ok) throw new Error("Failed to restore idea");
+    await refetch();
+  };
+
+  const deleteIdea = async (id: string) => {
+    const res = await fetch(`/api/ideas?id=${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error("Failed to delete idea");
+    await refetch();
+  };
+
+  const addTag = async (tag: string) => {
+    const res = await fetch("/api/ideas", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "add-tag", tag }),
+    });
+    if (!res.ok) throw new Error("Failed to add tag");
+    await refetch();
+  };
+
+  const deleteTag = async (tag: string) => {
+    const res = await fetch("/api/ideas", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "delete-tag", tag }),
+    });
+    if (!res.ok) throw new Error("Failed to delete tag");
+    await refetch();
+  };
+
+  return {
+    ideas: data?.ideas ?? [],
+    archive: data?.archive ?? [],
+    tags: data?.tags ?? DEFAULT_IDEA_TAGS,
+    loading,
+    error,
+    refetch,
+    addIdea,
+    updateIdea,
+    archiveIdea,
+    restoreIdea,
+    deleteIdea,
+    addTag,
+    deleteTag,
+  };
+}
+
 // Docs
 export interface Doc {
   id: string;

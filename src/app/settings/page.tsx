@@ -1,6 +1,6 @@
 "use client";
 
-import { useSprint, useCalendarStatus, useContent, useKanban } from "@/lib/hooks";
+import { useSprint, useCalendarStatus, useContent, useKanban, useIdeas } from "@/lib/hooks";
 import { Card, Badge, Button, Input, Skeleton } from "@/components/ui";
 import { Settings as SettingsIcon, Download, RotateCcw, Calendar, Palette, Plus, Trash2, Check, X, Tag } from "lucide-react";
 import { useState } from "react";
@@ -17,6 +17,7 @@ export default function SettingsPage() {
   const { connected: calendarConnected, source: calendarSource, cachedAt, loading: calendarLoading, refetch: refetchCalendar } = useCalendarStatus();
   const { angles, loading: anglesLoading, addAngle, updateAngle, deleteAngle } = useContent();
   const { labels, addLabel, deleteLabel } = useKanban();
+  const { tags: ideaTags, addTag, deleteTag } = useIdeas();
 
   const [sprintName, setSprintName] = useState("");
   const [sprintStart, setSprintStart] = useState("");
@@ -25,6 +26,9 @@ export default function SettingsPage() {
 
   // Label management state
   const [newLabelName, setNewLabelName] = useState("");
+
+  // Ideas tag management state
+  const [newTagName, setNewTagName] = useState("");
 
   // Angle management state
   const [newAngleName, setNewAngleName] = useState("");
@@ -297,6 +301,58 @@ export default function SettingsPage() {
                 addLabel(newLabelName.trim())
                   .then(() => { setNewLabelName(""); toast.success("Label added"); })
                   .catch(() => toast.error("Failed to add label"));
+              }}
+            >
+              <span className="flex items-center gap-1"><Plus size={14} /> Add</span>
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Ideas Tags */}
+      <Card>
+        <div className="flex items-center gap-2 mb-4">
+          <Tag size={18} className="text-accent" />
+          <h2 className="font-heading text-lg">Ideas Tags</h2>
+        </div>
+        <p className="text-xs text-text-secondary mb-4">
+          Tags used to categorize ideas on the Ideas page.
+        </p>
+        <div className="space-y-2 mb-4">
+          {ideaTags.length === 0 && (
+            <p className="text-xs text-text-secondary py-2">No tags yet.</p>
+          )}
+          {ideaTags.map((tag) => (
+            <div key={tag} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
+              <span className="text-sm font-mono">{tag}</span>
+              <button
+                onClick={() =>
+                  deleteTag(tag)
+                    .then(() => toast.success("Tag deleted"))
+                    .catch(() => toast.error("Failed to delete"))
+                }
+                className="p-1 text-text-secondary hover:text-danger transition-colors"
+              >
+                <Trash2 size={13} />
+              </button>
+            </div>
+          ))}
+        </div>
+        <div className="pt-3 border-t border-border">
+          <p className="text-xs text-text-secondary uppercase tracking-wider mb-2">Add Tag</p>
+          <div className="flex gap-2">
+            <Input
+              value={newTagName}
+              onChange={setNewTagName}
+              placeholder="Tag name..."
+              className="flex-1"
+            />
+            <Button
+              onClick={() => {
+                if (!newTagName.trim()) return;
+                addTag(newTagName.trim())
+                  .then(() => { setNewTagName(""); toast.success("Tag added"); })
+                  .catch(() => toast.error("Failed to add tag"));
               }}
             >
               <span className="flex items-center gap-1"><Plus size={14} /> Add</span>
