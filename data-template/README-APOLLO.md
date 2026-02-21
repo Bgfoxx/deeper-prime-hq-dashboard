@@ -105,7 +105,12 @@ Daily agenda entries with Apollo's morning briefing notes.
 Entry fields: `id`, `date`, `apolloNotes`, `sentToTelegram`, `sentAt`, `createdAt`, `updatedAt`
 
 ### ideas.json
-Shared idea capture for Ivan and Apollo.
+The central Ideas hub — where all ideas live, regardless of source.
+
+**Three ways to add ideas:**
+1. **Ivan logs manually** — he adds ideas directly in the dashboard
+2. **Ivan sends to Apollo** — he messages me on Telegram with an idea, I log it
+3. **Apollo adds** — I generate ideas during research, task generation, or docs review and add them myself
 
 **Schema:**
 ```json
@@ -128,12 +133,12 @@ Shared idea capture for Ivan and Apollo.
 ```
 
 **Apollo's ideas protocol:**
-- When Ivan messages you with a new idea through Telegram, add it to `ideas.json` with `source: "apollo"`
-- Use `POST /api/ideas` with `{ title, body, tags, source: "apollo" }`, or write directly to the JSON file
-- Choose relevant tags from the `tags` array — do not invent new tags unless you also add them to the `tags` array
+- When Ivan sends an idea on Telegram, add it to `ideas.json` with `source: "ivan"`
+- When I generate an idea myself, add it with `source: "apollo"`
+- Choose relevant tags from the `tags` array — do not invent new tags unless I also add them to the `tags` array
 - Set `title` to a concise phrase (5–10 words max); put details in `body`
-- Never delete ideas — use `PUT /api/ideas` with `{ id, action: "archive" }` to archive, or archive directly in the JSON
-- When Ivan asks you to refine or elaborate on an existing idea, update it via `PUT /api/ideas` with `{ id, body: "updated text" }`
+- Never delete ideas — archive instead if no longer relevant
+- When Ivan asks to refine or elaborate on an existing idea, update it
 
 **API endpoints:**
 - `GET /api/ideas` — fetch all ideas, archive, and tags
