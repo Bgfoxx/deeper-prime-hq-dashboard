@@ -8,6 +8,8 @@ import { toast } from "sonner";
 
 const labelOptions = ["research", "tool-building", "content", "admin"];
 const priorityOptions = ["high", "medium", "low"];
+const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
+const DONE_CAP = 6;
 
 const columnColors: Record<string, string> = {
   backlog: "border-t-text-secondary",
@@ -68,7 +70,7 @@ export default function ApolloBoard() {
     low: "bg-text-secondary/30",
   };
 
-  if (loading) {
+  if (loading && columns.length === 0) {
     return (
       <div className="space-y-6">
         <Skeleton className="h-8 w-48" />
@@ -102,16 +104,21 @@ export default function ApolloBoard() {
           >
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-medium">{col.title}</h3>
-              <Badge color="muted">{col.cards.length}</Badge>
+              <Badge color={col.id === "done" && col.cards.length >= DONE_CAP ? "warning" : "muted"}>
+                {col.cards.length}{col.id === "done" ? `/${DONE_CAP}` : ""}
+              </Badge>
             </div>
 
             <div className="flex-1 space-y-2 overflow-y-auto">
-              {col.cards.map((card) => (
+              {[...col.cards]
+                .sort((a, b) => (priorityOrder[a.priority] ?? 1) - (priorityOrder[b.priority] ?? 1))
+                .map((card) => (
                 <div
                   key={card.id}
                   draggable
                   onDragStart={() => handleDragStart(card.id, col.id)}
-                  className="bg-surface border border-border rounded-lg p-3 cursor-grab active:cursor-grabbing hover:border-accent/30 transition-colors group"
+                  onClick={() => setEditingCard(card)}
+                  className="bg-surface border border-border rounded-lg p-3 cursor-pointer hover:border-accent/30 transition-colors group"
                 >
                   <div className="flex items-start gap-2">
                     <GripVertical size={14} className="text-text-secondary/30 mt-0.5 flex-shrink-0" />
@@ -139,22 +146,16 @@ export default function ApolloBoard() {
                       )}
                     </div>
                   </div>
-                  <div className="flex justify-end gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => setEditingCard(card)}
-                      className="text-xs text-text-secondary hover:text-accent"
-                    >
-                      Edit
-                    </button>
-                    {col.id === "done" && (
+                  {col.id === "done" && (
+                    <div className="flex justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={() => handleArchive(card.id, col.id)}
-                        className="text-xs text-text-secondary hover:text-accent ml-2"
+                        onClick={(e) => { e.stopPropagation(); handleArchive(card.id, col.id); }}
+                        className="text-xs text-text-secondary hover:text-accent"
                       >
                         <Archive size={12} />
                       </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

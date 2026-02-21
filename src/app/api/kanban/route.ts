@@ -56,6 +56,8 @@ export async function POST(request: Request) {
   return NextResponse.json(result);
 }
 
+const DONE_CAP = 6;
+
 export async function PUT(request: Request) {
   const body = await request.json();
 
@@ -74,7 +76,17 @@ export async function PUT(request: Request) {
       card.updatedAt = new Date().toISOString();
       toCol.cards.splice(toIndex, 0, card);
 
-      return { ...current, columns: cols };
+      // Auto-archive oldest cards when Done column exceeds cap
+      let archive = [...(current.archive || [])];
+      if (toColumn === "done" && toCol.cards.length > DONE_CAP) {
+        const sorted = [...toCol.cards].sort((a, b) => a.updatedAt.localeCompare(b.updatedAt));
+        const toArchive = sorted.slice(0, sorted.length - DONE_CAP);
+        const archiveIds = new Set(toArchive.map((c) => c.id));
+        toCol.cards = toCol.cards.filter((c) => !archiveIds.has(c.id));
+        archive = [...toArchive, ...archive];
+      }
+
+      return { ...current, columns: cols, archive };
     });
     return NextResponse.json(result);
   }
