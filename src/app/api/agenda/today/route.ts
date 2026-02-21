@@ -27,9 +27,20 @@ interface AgendaEntry {
 export async function GET() {
   const today = new Date().toISOString().split("T")[0];
 
-  // Fetch tasks for today
-  const tasksData = await readJsonFile<{ tasks: Task[] }>("tasks.json");
-  const todayTasks = tasksData.tasks.filter((t) => t.date === today);
+  // Fetch tasks for today (normalize Apollo-created tasks with done: bool schema)
+  const tasksData = await readJsonFile<{ tasks: (Task & { done?: boolean })[] }>("tasks.json");
+  const allTasks: Task[] = tasksData.tasks.map((t) => ({
+    id: t.id as string,
+    title: t.title as string,
+    date: t.date as string,
+    priority: (t.priority as string) || "medium",
+    status: t.status || (t.done === true ? "done" : "todo"),
+    category: (t.category as string) || "deeper-prime",
+    notes: (t.notes as string) || "",
+    createdAt: t.createdAt as string,
+    completedAt: (t.completedAt as string) || null,
+  }));
+  const todayTasks = allTasks.filter((t) => t.date === today && t.status !== "done");
 
   // Fetch calendar events for today (graceful fallback)
   let events: { id: string; title: string; start: string; end: string; allDay: boolean; location: string }[] = [];

@@ -25,7 +25,7 @@ const defaults: Record<string, unknown> = {
     archive: [],
     lastModified: new Date().toISOString(),
   },
-  "content-pipeline.json": { content: [], angles: [], lastModified: new Date().toISOString() },
+  "content-pipeline.json": { content: [], archive: [], angles: [], lastModified: new Date().toISOString() },
   "memory-log.json": { entries: [], lastModified: new Date().toISOString() },
   "analytics.json": { platforms: {}, lastModified: new Date().toISOString() },
   "docs-registry.json": { docs: [], lastModified: new Date().toISOString() },
@@ -95,5 +95,82 @@ export async function listDocFiles(): Promise<string[]> {
     return files.filter((f) => !f.startsWith(".") && !f.includes(".sync-conflict-"));
   } catch {
     return [];
+  }
+}
+
+export async function readDraftFile(pieceId: string, format: string): Promise<string> {
+  const filePath = path.join(getDataDir(), "drafts", `${pieceId}-${format}.md`);
+  try {
+    return await fs.readFile(filePath, "utf-8");
+  } catch {
+    return "";
+  }
+}
+
+export async function writeDraftFile(pieceId: string, format: string, content: string): Promise<void> {
+  const dir = path.join(getDataDir(), "drafts");
+  await fs.mkdir(dir, { recursive: true });
+  const filePath = path.join(dir, `${pieceId}-${format}.md`);
+  await fs.writeFile(filePath, content, "utf-8");
+}
+
+const MAX_BACKUPS = 10;
+
+export async function writeDraftFileWithBackup(pieceId: string, format: string, newContent: string): Promise<void> {
+  const backupsDir = path.join(getDataDir(), "drafts", "backups");
+
+  // Read current content — only backup if it exists and actually changed
+  const existing = await readDraftFile(pieceId, format);
+  if (existing && existing.trim() !== newContent.trim()) {
+    await fs.mkdir(backupsDir, { recursive: true });
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-"); // YYYY-MM-DDTHH-MM-SS
+    const backupName = `${pieceId}-${format}-${timestamp}.md`;
+    await fs.writeFile(path.join(backupsDir, backupName), existing, "utf-8");
+
+    // Prune: keep only the most recent MAX_BACKUPS for this piece+format
+    const prefix = `${pieceId}-${format}-`;
+    const all = await fs.readdir(backupsDir);
+    const mine = all
+      .filter((f) => f.startsWith(prefix) && f.endsWith(".md") && !f.includes(".sync-conflict-"))
+      .sort(); // ISO-based name sorts chronologically
+    if (mine.length > MAX_BACKUPS) {
+      for (const old of mine.slice(0, mine.length - MAX_BACKUPS)) {
+        await fs.unlink(path.join(backupsDir, old)).catch(() => {});
+      }
+    }
+  }
+
+  await writeDraftFile(pieceId, format, newContent);
+}
+
+export async function listDraftBackups(
+  pieceId: string,
+  format: string
+): Promise<{ filename: string; savedAt: string }[]> {
+  const backupsDir = path.join(getDataDir(), "drafts", "backups");
+  try {
+    const prefix = `${pieceId}-${format}-`;
+    const all = await fs.readdir(backupsDir);
+    return all
+      .filter((f) => f.startsWith(prefix) && f.endsWith(".md") && !f.includes(".sync-conflict-"))
+      .sort()
+      .reverse() // newest first
+      .map((filename) => {
+        const ts = filename.slice(prefix.length, -3); // strip prefix + ".md"
+        const savedAt = ts.replace(/T(\d{2})-(\d{2})-(\d{2})$/, "T$1:$2:$3") + "Z";
+        return { filename, savedAt };
+      });
+  } catch {
+    return [];
+  }
+}
+
+export async function readDraftBackup(filename: string): Promise<string> {
+  const safe = path.basename(filename); // no directory traversal
+  const filePath = path.join(getDataDir(), "drafts", "backups", safe);
+  try {
+    return await fs.readFile(filePath, "utf-8");
+  } catch {
+    return "";
   }
 }

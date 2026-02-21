@@ -1,18 +1,33 @@
 "use client";
 
-import { useSprint, useCalendarStatus } from "@/lib/hooks";
+import { useSprint, useCalendarStatus, useContent } from "@/lib/hooks";
 import { Card, Badge, Button, Input, Skeleton } from "@/components/ui";
-import { Settings as SettingsIcon, Download, RotateCcw, Calendar, Palette } from "lucide-react";
+import { Settings as SettingsIcon, Download, RotateCcw, Calendar, Palette, Plus, Trash2, Check, X } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+
+const PRESET_COLORS = [
+  "#D97706", "#B45309", "#6B8F71", "#C2695B",
+  "#7C6F9C", "#5B8A9C", "#9C8B5B", "#6B7280",
+  "#A16207", "#065F46", "#9D174D", "#1D4ED8",
+];
 
 export default function SettingsPage() {
   const { sprint, loading, updateSprint } = useSprint();
   const { connected: calendarConnected, source: calendarSource, cachedAt, loading: calendarLoading, refetch: refetchCalendar } = useCalendarStatus();
+  const { angles, loading: anglesLoading, addAngle, updateAngle, deleteAngle } = useContent();
+
   const [sprintName, setSprintName] = useState("");
   const [sprintStart, setSprintStart] = useState("");
   const [sprintEnd, setSprintEnd] = useState("");
   const [showResetConfirm, setShowResetConfirm] = useState(false);
+
+  // Angle management state
+  const [newAngleName, setNewAngleName] = useState("");
+  const [newAngleColor, setNewAngleColor] = useState(PRESET_COLORS[0]);
+  const [editingAngleId, setEditingAngleId] = useState<string | null>(null);
+  const [editAngleName, setEditAngleName] = useState("");
+  const [editAngleColor, setEditAngleColor] = useState("");
 
   // Initialize form from sprint data
   const currentSprint = sprint?.currentSprint;
@@ -107,6 +122,130 @@ export default function SettingsPage() {
             </div>
           </div>
           <Button onClick={handleSprintUpdate}>Save Sprint Settings</Button>
+        </div>
+      </Card>
+
+      {/* Content Angles */}
+      <Card>
+        <div className="flex items-center gap-2 mb-4">
+          <Palette size={18} className="text-accent" />
+          <h2 className="font-heading text-lg">Content Angles</h2>
+        </div>
+        <p className="text-xs text-text-secondary mb-4">
+          Angles are the thematic lenses you apply to content — the recurring narrative frames across all formats.
+        </p>
+
+        {anglesLoading ? (
+          <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-9" />)}</div>
+        ) : (
+          <div className="space-y-2 mb-4">
+            {angles.length === 0 && (
+              <p className="text-xs text-text-secondary py-2">No angles yet. Add one below.</p>
+            )}
+            {angles.map((angle) => (
+              <div key={angle.id} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
+                {editingAngleId === angle.id ? (
+                  <>
+                    <div className="flex gap-1">
+                      {PRESET_COLORS.map((c) => (
+                        <button
+                          key={c}
+                          onClick={() => setEditAngleColor(c)}
+                          className={`w-4 h-4 rounded-full transition-transform ${editAngleColor === c ? "scale-125 ring-1 ring-white/40" : ""}`}
+                          style={{ backgroundColor: c }}
+                        />
+                      ))}
+                    </div>
+                    <input
+                      value={editAngleName}
+                      onChange={(e) => setEditAngleName(e.target.value)}
+                      className="flex-1 bg-surface border border-border rounded px-2 py-1 text-sm text-text-primary focus:outline-none focus:border-accent/50"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          updateAngle(angle.id, editAngleName, editAngleColor)
+                            .then(() => { setEditingAngleId(null); toast.success("Angle updated"); })
+                            .catch(() => toast.error("Failed to update"));
+                        }
+                        if (e.key === "Escape") setEditingAngleId(null);
+                      }}
+                      autoFocus
+                    />
+                    <button
+                      onClick={() =>
+                        updateAngle(angle.id, editAngleName, editAngleColor)
+                          .then(() => { setEditingAngleId(null); toast.success("Angle updated"); })
+                          .catch(() => toast.error("Failed to update"))
+                      }
+                      className="p-1 text-success hover:text-success/80 transition-colors"
+                    >
+                      <Check size={14} />
+                    </button>
+                    <button onClick={() => setEditingAngleId(null)} className="p-1 text-text-secondary hover:text-text-primary transition-colors">
+                      <X size={14} />
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: angle.color }} />
+                    <span
+                      className="flex-1 text-sm cursor-pointer hover:text-accent transition-colors"
+                      onClick={() => {
+                        setEditingAngleId(angle.id);
+                        setEditAngleName(angle.name);
+                        setEditAngleColor(angle.color);
+                      }}
+                    >
+                      {angle.name}
+                    </span>
+                    <button
+                      onClick={() =>
+                        deleteAngle(angle.id)
+                          .then(() => toast.success("Angle deleted"))
+                          .catch(() => toast.error("Failed to delete"))
+                      }
+                      className="p-1 text-text-secondary hover:text-danger transition-colors"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Add new angle */}
+        <div className="pt-3 border-t border-border space-y-3">
+          <p className="text-xs text-text-secondary uppercase tracking-wider">Add Angle</p>
+          <div className="flex gap-1 flex-wrap">
+            {PRESET_COLORS.map((c) => (
+              <button
+                key={c}
+                onClick={() => setNewAngleColor(c)}
+                className={`w-5 h-5 rounded-full transition-transform ${newAngleColor === c ? "scale-125 ring-1 ring-white/40" : ""}`}
+                style={{ backgroundColor: c }}
+              />
+            ))}
+          </div>
+          <div className="flex gap-2">
+            <div className="w-4 h-4 rounded-full mt-2.5 flex-shrink-0" style={{ backgroundColor: newAngleColor }} />
+            <Input
+              value={newAngleName}
+              onChange={setNewAngleName}
+              placeholder="Angle name..."
+              className="flex-1"
+            />
+            <Button
+              onClick={() => {
+                if (!newAngleName.trim()) return;
+                addAngle(newAngleName.trim(), newAngleColor)
+                  .then(() => { setNewAngleName(""); toast.success("Angle added"); })
+                  .catch(() => toast.error("Failed to add angle"));
+              }}
+            >
+              <span className="flex items-center gap-1"><Plus size={14} /> Add</span>
+            </Button>
+          </div>
         </div>
       </Card>
 

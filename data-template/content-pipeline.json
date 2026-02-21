@@ -6,14 +6,37 @@
       "angle": "What do you do? obsolescence",
       "stage": "idea",
       "formats": {
-        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
-        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
-        "email": { "status": "not-started", "publishDate": null, "url": "" }
+        "linkedin": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "youtube": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "email": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "twitter": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "instagram": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        }
       },
       "coreIdea": "The most common question we ask when meeting someone - 'What do you do?' - is already starting to fail us. Reframe from someday to NOW.",
       "notes": "",
       "weekNumber": 1,
-      "createdAt": "2026-02-15T00:00:00.000Z"
+      "createdAt": "2026-02-15T00:00:00.000Z",
+      "publishedAt": null
     },
     {
       "id": "content-002",
@@ -21,14 +44,37 @@
       "angle": "Expertise devaluation",
       "stage": "idea",
       "formats": {
-        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
-        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
-        "email": { "status": "not-started", "publishDate": null, "url": "" }
+        "linkedin": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "youtube": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "email": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "twitter": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "instagram": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        }
       },
       "coreIdea": "",
       "notes": "",
       "weekNumber": 2,
-      "createdAt": "2026-02-15T00:00:00.000Z"
+      "createdAt": "2026-02-15T00:00:00.000Z",
+      "publishedAt": null
     },
     {
       "id": "content-003",
@@ -36,14 +82,37 @@
       "angle": "Identity scaffolding",
       "stage": "idea",
       "formats": {
-        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
-        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
-        "email": { "status": "not-started", "publishDate": null, "url": "" }
+        "linkedin": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "youtube": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "email": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "twitter": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "instagram": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        }
       },
       "coreIdea": "",
       "notes": "",
       "weekNumber": 3,
-      "createdAt": "2026-02-15T00:00:00.000Z"
+      "createdAt": "2026-02-15T00:00:00.000Z",
+      "publishedAt": null
     },
     {
       "id": "content-004",
@@ -51,14 +120,37 @@
       "angle": "Body as strategic asset",
       "stage": "idea",
       "formats": {
-        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
-        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
-        "email": { "status": "not-started", "publishDate": null, "url": "" }
+        "linkedin": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "youtube": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "email": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "twitter": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "instagram": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        }
       },
       "coreIdea": "",
       "notes": "",
       "weekNumber": 4,
-      "createdAt": "2026-02-15T00:00:00.000Z"
+      "createdAt": "2026-02-15T00:00:00.000Z",
+      "publishedAt": null
     },
     {
       "id": "content-005",
@@ -66,14 +158,37 @@
       "angle": "Male loneliness and depth",
       "stage": "idea",
       "formats": {
-        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
-        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
-        "email": { "status": "not-started", "publishDate": null, "url": "" }
+        "linkedin": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "youtube": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "email": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "twitter": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "instagram": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        }
       },
       "coreIdea": "",
       "notes": "",
       "weekNumber": 5,
-      "createdAt": "2026-02-15T00:00:00.000Z"
+      "createdAt": "2026-02-15T00:00:00.000Z",
+      "publishedAt": null
     },
     {
       "id": "content-006",
@@ -81,14 +196,37 @@
       "angle": "Preparing for wrong future",
       "stage": "idea",
       "formats": {
-        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
-        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
-        "email": { "status": "not-started", "publishDate": null, "url": "" }
+        "linkedin": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "youtube": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "email": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "twitter": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "instagram": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        }
       },
       "coreIdea": "",
       "notes": "",
       "weekNumber": 6,
-      "createdAt": "2026-02-15T00:00:00.000Z"
+      "createdAt": "2026-02-15T00:00:00.000Z",
+      "publishedAt": null
     },
     {
       "id": "content-007",
@@ -96,24 +234,76 @@
       "angle": "AI as mirror",
       "stage": "idea",
       "formats": {
-        "linkedin": { "status": "not-started", "publishDate": null, "url": "" },
-        "youtube": { "status": "not-started", "publishDate": null, "url": "" },
-        "email": { "status": "not-started", "publishDate": null, "url": "" }
+        "linkedin": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "youtube": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "email": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "twitter": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        },
+        "instagram": {
+          "status": "not-started",
+          "publishDate": null,
+          "url": ""
+        }
       },
       "coreIdea": "",
       "notes": "",
       "weekNumber": 7,
-      "createdAt": "2026-02-15T00:00:00.000Z"
+      "createdAt": "2026-02-15T00:00:00.000Z",
+      "publishedAt": null
     }
   ],
   "angles": [
-    { "id": "angle-1", "name": "What do you do? obsolescence", "color": "#D97706" },
-    { "id": "angle-2", "name": "Expertise devaluation", "color": "#B45309" },
-    { "id": "angle-3", "name": "Identity scaffolding", "color": "#6B8F71" },
-    { "id": "angle-4", "name": "Body as strategic asset", "color": "#C2695B" },
-    { "id": "angle-5", "name": "Male loneliness and depth", "color": "#7C6F9C" },
-    { "id": "angle-6", "name": "Preparing for wrong future", "color": "#5B8A9C" },
-    { "id": "angle-7", "name": "AI as mirror", "color": "#9C8B5B" }
+    {
+      "id": "angle-1",
+      "name": "What do you do? obsolescence",
+      "color": "#D97706"
+    },
+    {
+      "id": "angle-2",
+      "name": "Expertise devaluation",
+      "color": "#B45309"
+    },
+    {
+      "id": "angle-3",
+      "name": "Identity scaffolding",
+      "color": "#6B8F71"
+    },
+    {
+      "id": "angle-4",
+      "name": "Body as strategic asset",
+      "color": "#C2695B"
+    },
+    {
+      "id": "angle-5",
+      "name": "Male loneliness and depth",
+      "color": "#7C6F9C"
+    },
+    {
+      "id": "angle-6",
+      "name": "Preparing for wrong future",
+      "color": "#5B8A9C"
+    },
+    {
+      "id": "angle-7",
+      "name": "AI as mirror",
+      "color": "#9C8B5B"
+    }
   ],
-  "lastModified": "2026-02-15T00:00:00.000Z"
+  "lastModified": "2026-02-15T00:00:00.000Z",
+  "archive": []
 }

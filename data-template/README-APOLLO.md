@@ -42,9 +42,36 @@ Apollo's task board with 4 columns: backlog, in-progress, review, done.
 
 ### content-pipeline.json
 Content ideas through lifecycle stages: idea -> researching -> drafting -> ready -> published.
-- Each piece has per-format status (linkedin, youtube, email)
+- Each piece has per-format status: linkedin, youtube, email, twitter, instagram (not-started / drafting / ready / published)
 - Update per-format status independently
 - Add publish dates and URLs when content goes live
+- Set `publishedAt` timestamp when moving a piece to the `published` stage
+- The `archive` array holds pieces removed from the active pipeline — do NOT touch the archive; archiving is Ivan's decision
+
+**Apollo's content protocol:**
+- When Ivan asks you to research a topic, update `stage` to `researching` and write research to `drafts/{piece-id}-research.md`
+- When drafting, update `stage` to `drafting` and write to format-specific draft files (see below)
+- When a draft is ready for Ivan's review, update `stage` to `ready` and set relevant format `status` fields to `ready`
+- Never move a piece to `published` — Ivan confirms publication
+
+## Content Drafts (drafts/ folder)
+
+Draft documents live in `DATA_DIR/drafts/` as individual markdown files, synced via Syncthing.
+
+**Naming convention:**
+- `drafts/{piece-id}-research.md` — Research brief: hooks, angles, data points, sources
+- `drafts/{piece-id}-youtube.md` — Full video script or structured outline
+- `drafts/{piece-id}-linkedin.md` — LinkedIn post (hook + body + CTA)
+- `drafts/{piece-id}-twitter.md` — Twitter/X thread or single post
+- `drafts/{piece-id}-instagram.md` — Caption + hashtag block
+- `drafts/{piece-id}-email.md` — Email newsletter version
+
+**Writing protocol:**
+1. Always read the existing file before writing — preserve Ivan's edits
+2. Write clean markdown: `#` for title, `##` for sections, `-` for bullets
+3. For YouTube scripts, use `[HOOK]`, `[B-ROLL]`, `[CUT TO]` markers as section labels
+4. For research briefs, structure as: Hook Options → Core Argument → Supporting Evidence → Counterarguments → Angles
+5. Never delete content Ivan has written — if suggesting an alternative, append below a `---` divider with a note
 
 ### memory-log.json
 The ship's log of the Deeper Prime project.

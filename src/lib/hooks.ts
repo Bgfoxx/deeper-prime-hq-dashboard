@@ -215,11 +215,14 @@ export interface ContentPiece {
     linkedin: { status: string; publishDate: string | null; url: string };
     youtube: { status: string; publishDate: string | null; url: string };
     email: { status: string; publishDate: string | null; url: string };
+    twitter: { status: string; publishDate: string | null; url: string };
+    instagram: { status: string; publishDate: string | null; url: string };
   };
   coreIdea: string;
   notes: string;
   weekNumber: number;
   createdAt: string;
+  publishedAt?: string | null;
 }
 
 export interface ContentAngle {
@@ -230,6 +233,7 @@ export interface ContentAngle {
 
 interface ContentData {
   content: ContentPiece[];
+  archive: ContentPiece[];
   angles: ContentAngle[];
   lastModified: string;
 }
@@ -257,14 +261,65 @@ export function useContent() {
     await refetch();
   };
 
-  const deleteContent = async (id: string) => {
-    const res = await fetch(`/api/content?id=${id}`, { method: "DELETE" });
+  const deleteContent = async (id: string, from: "content" | "archive" = "content") => {
+    const res = await fetch(`/api/content?id=${id}&from=${from}`, { method: "DELETE" });
     if (!res.ok) throw new Error("Failed to delete content");
+    await refetch();
+  };
+
+  const archivePiece = async (id: string) => {
+    const res = await fetch("/api/content", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "archive" }),
+    });
+    if (!res.ok) throw new Error("Failed to archive piece");
+    await refetch();
+  };
+
+  const restorePiece = async (id: string) => {
+    const res = await fetch("/api/content", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "restore" }),
+    });
+    if (!res.ok) throw new Error("Failed to restore piece");
+    await refetch();
+  };
+
+  const addAngle = async (name: string, color: string) => {
+    const res = await fetch("/api/content", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "add-angle", name, color }),
+    });
+    if (!res.ok) throw new Error("Failed to add angle");
+    await refetch();
+  };
+
+  const updateAngle = async (id: string, name: string, color: string) => {
+    const res = await fetch("/api/content", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "update-angle", name, color }),
+    });
+    if (!res.ok) throw new Error("Failed to update angle");
+    await refetch();
+  };
+
+  const deleteAngle = async (id: string) => {
+    const res = await fetch("/api/content", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, action: "delete-angle" }),
+    });
+    if (!res.ok) throw new Error("Failed to delete angle");
     await refetch();
   };
 
   return {
     content: data?.content ?? [],
+    archive: data?.archive ?? [],
     angles: data?.angles ?? [],
     loading,
     error,
@@ -272,7 +327,53 @@ export function useContent() {
     addContent,
     updateContent,
     deleteContent,
+    archivePiece,
+    restorePiece,
+    addAngle,
+    updateAngle,
+    deleteAngle,
   };
+}
+
+// Content Draft (markdown files per piece+format)
+export type DraftFormat = "research" | "youtube" | "linkedin" | "twitter" | "instagram" | "email";
+
+export function useContentDraft(pieceId: string | null, format: DraftFormat) {
+  const [draftContent, setDraftContent] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+
+  const load = useCallback(async () => {
+    if (!pieceId) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/content/draft?pieceId=${pieceId}&format=${format}`);
+      const json = await res.json();
+      setDraftContent(json.content ?? "");
+    } finally {
+      setLoading(false);
+    }
+  }, [pieceId, format]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const saveDraft = useCallback(async (text: string) => {
+    if (!pieceId) return;
+    setSaving(true);
+    try {
+      await fetch("/api/content/draft", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pieceId, format, content: text }),
+      });
+      setLastSaved(new Date());
+    } finally {
+      setSaving(false);
+    }
+  }, [pieceId, format]);
+
+  return { draftContent, setDraftContent, loading, saving, lastSaved, saveDraft, reload: load };
 }
 
 // Memory Log

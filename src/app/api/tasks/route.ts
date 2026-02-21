@@ -19,9 +19,32 @@ interface TasksData {
   lastModified: string;
 }
 
+// Normalize tasks written by Apollo or older schema (done: bool, missing fields)
+type RawTask = Task & { done?: boolean };
+
+function normalizeTask(t: RawTask): Task {
+  const status = t.status || (t.done === true ? "done" : "todo");
+  return {
+    id: t.id,
+    title: t.title,
+    date: t.date,
+    priority: t.priority || "medium",
+    status,
+    category: t.category || "deeper-prime",
+    notes: t.notes || "",
+    createdAt: t.createdAt,
+    completedAt: t.completedAt || null,
+  };
+}
+
+interface RawTasksData {
+  tasks: RawTask[];
+  lastModified: string;
+}
+
 export async function GET() {
-  const data = await readJsonFile<TasksData>("tasks.json");
-  return NextResponse.json(data);
+  const data = await readJsonFile<RawTasksData>("tasks.json");
+  return NextResponse.json({ ...data, tasks: data.tasks.map(normalizeTask) });
 }
 
 export async function POST(request: Request) {
