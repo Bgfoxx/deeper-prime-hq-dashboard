@@ -2,7 +2,7 @@
 
 import { useDocs, Doc } from "@/lib/hooks";
 import { Card, Badge, Button, Input, Textarea, Select, Skeleton, EmptyState } from "@/components/ui";
-import { FileText, Search, Plus, ArrowLeft, X } from "lucide-react";
+import { FileText, Search, Plus, ArrowLeft, X, Pencil, Save } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -10,10 +10,12 @@ import ReactMarkdown from "react-markdown";
 const categories = ["strategy", "content", "research", "personal"];
 
 export default function DocsPage() {
-  const { docs, loading, addDoc, getDocContent } = useDocs();
+  const { docs, loading, addDoc, getDocContent, updateDoc } = useDocs();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [viewingDoc, setViewingDoc] = useState<{ doc: Doc; content: string } | null>(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editFields, setEditFields] = useState({ title: "", description: "", category: "", content: "" });
   const [showAdd, setShowAdd] = useState(false);
   const [newDoc, setNewDoc] = useState({
     filename: "",
@@ -35,6 +37,32 @@ export default function DocsPage() {
   const openDoc = async (doc: Doc) => {
     const content = await getDocContent(doc.filename);
     setViewingDoc({ doc, content });
+    setEditMode(false);
+  };
+
+  const startEdit = () => {
+    if (!viewingDoc) return;
+    setEditFields({
+      title: viewingDoc.doc.title,
+      description: viewingDoc.doc.description,
+      category: viewingDoc.doc.category,
+      content: viewingDoc.content,
+    });
+    setEditMode(true);
+  };
+
+  const handleSave = async () => {
+    if (!viewingDoc) return;
+    await updateDoc(viewingDoc.doc.id, {
+      title: editFields.title,
+      description: editFields.description,
+      category: editFields.category,
+      filename: viewingDoc.doc.filename,
+      content: editFields.content,
+    });
+    setViewingDoc({ doc: { ...viewingDoc.doc, ...editFields }, content: editFields.content });
+    setEditMode(false);
+    toast.success("Document saved");
   };
 
   const handleAdd = async () => {
@@ -62,31 +90,74 @@ export default function DocsPage() {
     );
   }
 
-  // Document viewer
+  // Document viewer / editor
   if (viewingDoc) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setViewingDoc(null)}
-            className="text-text-secondary hover:text-text-primary transition-colors"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div>
-            <h1 className="font-heading text-2xl">{viewingDoc.doc.title}</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge color="muted">{viewingDoc.doc.category}</Badge>
-              <span className="text-xs font-mono text-text-secondary">
-                {viewingDoc.doc.filename}
-              </span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => { setViewingDoc(null); setEditMode(false); }}
+              className="text-text-secondary hover:text-text-primary transition-colors"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <div>
+              {editMode ? (
+                <Input value={editFields.title} onChange={(v) => setEditFields({ ...editFields, title: v })} className="font-heading text-xl" />
+              ) : (
+                <h1 className="font-heading text-2xl">{viewingDoc.doc.title}</h1>
+              )}
+              <div className="flex items-center gap-2 mt-1">
+                {editMode ? (
+                  <Select
+                    value={editFields.category}
+                    onChange={(v) => setEditFields({ ...editFields, category: v })}
+                    options={categories.map((c) => ({ value: c, label: c }))}
+                  />
+                ) : (
+                  <Badge color="muted">{viewingDoc.doc.category}</Badge>
+                )}
+                <span className="text-xs font-mono text-text-secondary">{viewingDoc.doc.filename}</span>
+              </div>
+              {editMode && (
+                <Input
+                  value={editFields.description}
+                  onChange={(v) => setEditFields({ ...editFields, description: v })}
+                  placeholder="Description..."
+                  className="mt-2 text-sm"
+                />
+              )}
             </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {editMode ? (
+              <>
+                <Button variant="ghost" onClick={() => setEditMode(false)}>Cancel</Button>
+                <Button onClick={handleSave}>
+                  <span className="flex items-center gap-1.5"><Save size={14} /> Save</span>
+                </Button>
+              </>
+            ) : (
+              <Button variant="secondary" onClick={startEdit}>
+                <span className="flex items-center gap-1.5"><Pencil size={14} /> Edit</span>
+              </Button>
+            )}
           </div>
         </div>
         <Card>
-          <div className="prose prose-invert prose-sm max-w-none">
-            <ReactMarkdown>{viewingDoc.content || "*No content yet*"}</ReactMarkdown>
-          </div>
+          {editMode ? (
+            <textarea
+              value={editFields.content}
+              onChange={(e) => setEditFields({ ...editFields, content: e.target.value })}
+              className="w-full min-h-[60vh] bg-transparent text-text-primary text-sm font-mono leading-relaxed resize-none focus:outline-none"
+              spellCheck
+            />
+          ) : (
+            <div className="prose prose-invert prose-sm max-w-none">
+              <ReactMarkdown>{viewingDoc.content || "*No content yet*"}</ReactMarkdown>
+            </div>
+          )}
         </Card>
       </div>
     );

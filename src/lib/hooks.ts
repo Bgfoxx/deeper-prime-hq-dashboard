@@ -665,6 +665,19 @@ export function useDocs() {
     return json.content ?? "";
   };
 
+  const updateDoc = async (
+    id: string,
+    updates: { title?: string; description?: string; category?: string; filename?: string; content?: string }
+  ) => {
+    const res = await fetch("/api/docs", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, ...updates }),
+    });
+    if (!res.ok) throw new Error("Failed to update doc");
+    await refetch();
+  };
+
   return {
     docs: data?.docs ?? [],
     loading,
@@ -672,5 +685,6 @@ export function useDocs() {
     refetch,
     addDoc,
     getDocContent,
+    updateDoc,
   };
 }
