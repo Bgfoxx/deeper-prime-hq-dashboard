@@ -227,44 +227,38 @@ function Studio({
             />
           </div>
 
-          {/* Format Statuses */}
+          {/* Channels */}
           <div>
-            <p className="text-xs text-text-secondary mb-2 uppercase tracking-wider">Format Status</p>
-            <div className="space-y-2">
+            <p className="text-xs text-text-secondary mb-2 uppercase tracking-wider">Channels</p>
+            <div className="flex flex-wrap gap-2">
               {(["linkedin", "youtube", "email", "twitter", "instagram"] as const).map((format) => {
                 const data = meta.formats[format] ?? { status: "not-started", publishDate: null, url: "" };
+                const selected = data.status !== "not-started";
+                const labels: Record<string, string> = {
+                  linkedin: "LinkedIn", youtube: "YouTube", email: "Email",
+                  twitter: "Twitter/X", instagram: "Instagram",
+                };
                 return (
-                  <div key={format} className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-text-secondary">{formatIcons[format]}</span>
-                      <Select
-                        value={data.status}
-                        onChange={(v) =>
-                          setMeta((m) => ({
-                            ...m,
-                            formats: { ...m.formats, [format]: { ...data, status: v } },
-                          }))
-                        }
-                        options={[
-                          { value: "not-started", label: "Not Started" },
-                          { value: "drafting", label: "Drafting" },
-                          { value: "ready", label: "Ready" },
-                          { value: "published", label: "Published" },
-                        ]}
-                      />
-                    </div>
-                    <Input
-                      value={data.url}
-                      onChange={(v) =>
-                        setMeta((m) => ({
-                          ...m,
-                          formats: { ...m.formats, [format]: { ...data, url: v } },
-                        }))
-                      }
-                      placeholder="URL..."
-                      className="text-xs"
-                    />
-                  </div>
+                  <button
+                    key={format}
+                    onClick={() =>
+                      setMeta((m) => ({
+                        ...m,
+                        formats: {
+                          ...m.formats,
+                          [format]: { ...data, status: selected ? "not-started" : "ready" },
+                        },
+                      }))
+                    }
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                      selected
+                        ? "border-accent text-accent bg-accent/10"
+                        : "border-border text-text-secondary hover:border-accent/30 hover:text-text-primary"
+                    }`}
+                  >
+                    {formatIcons[format]}
+                    {labels[format]}
+                  </button>
                 );
               })}
             </div>
@@ -462,12 +456,15 @@ export default function ContentPipeline() {
     useContent();
   const [viewMode, setViewMode] = useState<"board" | "list" | "archive">("board");
   const [filterAngle, setFilterAngle] = useState("all");
+  const [filterChannel, setFilterChannel] = useState("all");
   const [showAdd, setShowAdd] = useState(false);
   const [studioPiece, setStudioPiece] = useState<ContentPiece | null>(null);
   const [newPiece, setNewPiece] = useState({ title: "", angle: "" });
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  const filtered = filterAngle === "all" ? content : content.filter((c) => c.angle === filterAngle);
+  const filtered = content
+    .filter((c) => filterAngle === "all" || c.angle === filterAngle)
+    .filter((c) => filterChannel === "all" || c.formats[filterChannel as keyof typeof c.formats]?.status !== "not-started");
 
   const getAngleColor = (angleName: string) =>
     angles.find((a) => a.name === angleName)?.color || "#666";
@@ -535,26 +532,58 @@ export default function ContentPipeline() {
           ))}
         </div>
         {viewMode !== "archive" && (
-          <div className="flex gap-1 flex-wrap">
-            <button
-              onClick={() => setFilterAngle("all")}
-              className={`px-3 py-1.5 text-xs rounded-full transition-colors ${filterAngle === "all" ? "bg-accent/20 text-accent" : "text-text-secondary"}`}
-            >
-              All
-            </button>
-            {angles.map((angle) => (
+          <div className="space-y-2">
+            {/* Angle filter */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-text-secondary w-14 flex-shrink-0">Angle</span>
               <button
-                key={angle.id}
-                onClick={() => setFilterAngle(angle.name)}
-                className="px-3 py-1.5 text-xs rounded-full transition-colors"
-                style={{
-                  backgroundColor: filterAngle === angle.name ? angle.color + "33" : undefined,
-                  color: filterAngle === angle.name ? angle.color : undefined,
-                }}
+                onClick={() => setFilterAngle("all")}
+                className={`px-3 py-1.5 text-xs rounded-full transition-colors ${filterAngle === "all" ? "bg-accent/20 text-accent" : "text-text-secondary hover:text-text-primary"}`}
               >
-                {angle.name}
+                All
               </button>
-            ))}
+              {angles.map((angle) => (
+                <button
+                  key={angle.id}
+                  onClick={() => setFilterAngle(angle.name)}
+                  className="px-3 py-1.5 text-xs rounded-full transition-colors"
+                  style={{
+                    backgroundColor: filterAngle === angle.name ? angle.color + "33" : undefined,
+                    color: filterAngle === angle.name ? angle.color : "#A8A29E",
+                  }}
+                >
+                  {angle.name}
+                </button>
+              ))}
+            </div>
+            {/* Channel filter */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-text-secondary w-14 flex-shrink-0">Channel</span>
+              <button
+                onClick={() => setFilterChannel("all")}
+                className={`px-3 py-1.5 text-xs rounded-full transition-colors ${filterChannel === "all" ? "bg-accent/20 text-accent" : "text-text-secondary hover:text-text-primary"}`}
+              >
+                All
+              </button>
+              {(["linkedin", "youtube", "email", "twitter", "instagram"] as const).map((ch) => {
+                const labels: Record<string, string> = {
+                  linkedin: "LinkedIn", youtube: "YouTube", email: "Email",
+                  twitter: "Twitter/X", instagram: "Instagram",
+                };
+                return (
+                  <button
+                    key={ch}
+                    onClick={() => setFilterChannel(filterChannel === ch ? "all" : ch)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-full transition-colors ${
+                      filterChannel === ch ? "bg-accent/20 text-accent" : "text-text-secondary hover:text-text-primary"
+                    }`}
+                  >
+                    {formatIcons[ch]}
+                    {labels[ch]}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

@@ -197,22 +197,24 @@ export default function ApolloBoard() {
                         ))}
                       </div>
                       {card.apolloNotes && (
-                        <div className="mt-2 p-2 bg-accent/5 border-l-2 border-accent rounded text-xs text-text-secondary">
-                          {card.apolloNotes}
+                        <div className="mt-2 p-2 bg-accent/5 border-l-2 border-accent rounded text-xs text-text-secondary relative overflow-hidden">
+                          <span className="line-clamp-3">{card.apolloNotes}</span>
+                          <div
+                            className="absolute bottom-0 left-0 right-0 h-4 pointer-events-none"
+                            style={{ background: "linear-gradient(to top, #292524, transparent)" }}
+                          />
                         </div>
                       )}
                     </div>
                   </div>
-                  {col.id === "done" && (
-                    <div className="flex justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); handleArchive(card.id, col.id); }}
-                        className="text-xs text-text-secondary hover:text-accent"
-                      >
-                        <Archive size={12} />
-                      </button>
-                    </div>
-                  )}
+                  <div className="flex justify-end mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); handleArchive(card.id, col.id); }}
+                      className="text-xs text-text-secondary hover:text-accent"
+                    >
+                      <Archive size={12} />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -286,7 +288,7 @@ export default function ApolloBoard() {
       {/* Edit Card Modal */}
       {editingCard && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Card className="w-full max-w-lg !p-6">
+          <Card className="w-full max-w-2xl !p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-heading text-lg">Edit Card</h3>
               <button onClick={() => setEditingCard(null)}>
@@ -340,6 +342,7 @@ export default function ApolloBoard() {
                   value={editingCard.apolloNotes}
                   onChange={(v) => setEditingCard({ ...editingCard, apolloNotes: v })}
                   placeholder="Notes from Apollo..."
+                  rows={8}
                 />
               </div>
               <div className="flex justify-end gap-2">

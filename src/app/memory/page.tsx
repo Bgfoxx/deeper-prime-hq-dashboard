@@ -2,7 +2,7 @@
 
 import { useMemory, MemoryEntry, localToday } from "@/lib/hooks";
 import { Card, Badge, Button, Input, Textarea, Select, Skeleton, EmptyState } from "@/components/ui";
-import { BookOpen, Plus, Search, X } from "lucide-react";
+import { BookOpen, Plus, Search, X, ChevronRight, Archive } from "lucide-react";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
@@ -30,7 +30,9 @@ const typeBadgeColors: Record<string, "default" | "accent" | "success" | "warnin
 
 export default function MemoryLog() {
   const { entries, loading, addEntry, deleteEntry } = useMemory();
+  const [viewMode, setViewMode] = useState<"recent" | "archive">("recent");
   const [showAdd, setShowAdd] = useState(false);
+  const [expandedEntry, setExpandedEntry] = useState<MemoryEntry | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterTag, setFilterTag] = useState("all");
@@ -42,6 +44,16 @@ export default function MemoryLog() {
   });
 
   const today = localToday();
+
+  // Derive a YYYY-MM-DD date from an entry — Apollo often omits `date` and only writes `createdAt`
+  const entryDate = (e: MemoryEntry) => e.date || (e.createdAt ? e.createdAt.split("T")[0] : today);
+
+  // 7-day threshold (local date)
+  const sevenDaysAgo = useMemo(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }, []);
 
   // Filter and sort entries
   const filteredEntries = useMemo(() => {
@@ -61,15 +73,31 @@ export default function MemoryLog() {
     return result.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [entries, searchQuery, filterType, filterTag]);
 
+  const recentEntries = useMemo(
+    () => filteredEntries.filter((e) => entryDate(e) >= sevenDaysAgo),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filteredEntries, sevenDaysAgo]
+  );
+
+  const archiveEntries = useMemo(
+    () => filteredEntries.filter((e) => entryDate(e) < sevenDaysAgo),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [filteredEntries, sevenDaysAgo]
+  );
+
+  const visibleEntries = viewMode === "recent" ? recentEntries : archiveEntries;
+
   // Group by date
   const groupedByDate = useMemo(() => {
     const groups: Record<string, MemoryEntry[]> = {};
-    filteredEntries.forEach((entry) => {
-      if (!groups[entry.date]) groups[entry.date] = [];
-      groups[entry.date].push(entry);
+    visibleEntries.forEach((entry) => {
+      const d = entryDate(entry);
+      if (!groups[d]) groups[d] = [];
+      groups[d].push(entry);
     });
     return Object.entries(groups).sort((a, b) => b[0].localeCompare(a[0]));
-  }, [filteredEntries]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleEntries]);
 
   // Heat map data (last 90 days)
   const heatMapData = useMemo(() => {
@@ -119,11 +147,30 @@ export default function MemoryLog() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="font-heading text-3xl">Memory Log</h1>
-        <Button onClick={() => setShowAdd(!showAdd)}>
-          <span className="flex items-center gap-1.5">
-            <Plus size={16} /> New Entry
-          </span>
-        </Button>
+        <div className="flex items-center gap-3">
+          <div className="flex bg-surface rounded-lg border border-border overflow-hidden">
+            <button
+              onClick={() => setViewMode("recent")}
+              className={`px-4 py-2 text-sm transition-colors ${viewMode === "recent" ? "bg-accent text-white" : "text-text-secondary hover:text-text-primary"}`}
+            >
+              Recent ({recentEntries.length})
+            </button>
+            <button
+              onClick={() => setViewMode("archive")}
+              className={`px-4 py-2 text-sm flex items-center gap-1.5 transition-colors ${viewMode === "archive" ? "bg-accent text-white" : "text-text-secondary hover:text-text-primary"}`}
+            >
+              <Archive size={13} />
+              Archive ({archiveEntries.length})
+            </button>
+          </div>
+          {viewMode === "recent" && (
+            <Button onClick={() => setShowAdd(!showAdd)}>
+              <span className="flex items-center gap-1.5">
+                <Plus size={16} /> New Entry
+              </span>
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Heat Map */}
@@ -236,10 +283,14 @@ export default function MemoryLog() {
       {/* Entries Timeline */}
       {groupedByDate.length === 0 ? (
         <EmptyState
-          icon={<BookOpen size={48} />}
-          title="No entries yet"
-          description="Start your ship's log with your first entry"
-          action={<Button onClick={() => setShowAdd(true)}>Write First Entry</Button>}
+          icon={viewMode === "archive" ? <Archive size={48} /> : <BookOpen size={48} />}
+          title={viewMode === "archive" ? "Archive is empty" : "No entries yet"}
+          description={
+            viewMode === "archive"
+              ? "Entries older than 7 days will appear here automatically"
+              : "Start your ship's log with your first entry"
+          }
+          action={viewMode === "recent" ? <Button onClick={() => setShowAdd(true)}>Write First Entry</Button> : undefined}
         />
       ) : (
         <div className="space-y-6">
@@ -254,7 +305,8 @@ export default function MemoryLog() {
                 {dateEntries.map((entry) => (
                   <div
                     key={entry.id}
-                    className={`bg-surface border rounded-lg p-4 border-l-2 ${
+                    onClick={() => setExpandedEntry(entry)}
+                    className={`bg-surface border rounded-lg p-4 border-l-2 cursor-pointer hover:border-accent/30 transition-colors group ${
                       entry.author === "apollo"
                         ? "border-l-accent border-border"
                         : "border-l-text-primary/30 border-border"
@@ -269,19 +321,28 @@ export default function MemoryLog() {
                           {entry.author === "apollo" ? "Apollo" : "Ivan"}
                         </span>
                       </div>
-                      <button
-                        onClick={async () => {
-                          await deleteEntry(entry.id);
-                          toast.success("Entry deleted");
-                        }}
-                        className="text-text-secondary hover:text-danger transition-colors"
-                      >
-                        <X size={14} />
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <ChevronRight size={14} className="text-text-secondary/40 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteEntry(entry.id).then(() => toast.success("Entry deleted"));
+                          }}
+                          className="text-text-secondary hover:text-danger transition-colors"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
                     </div>
                     <h4 className="text-sm font-medium mb-1">{entry.title}</h4>
-                    <div className="text-sm text-text-secondary prose prose-invert prose-sm max-w-none">
-                      <ReactMarkdown>{entry.content}</ReactMarkdown>
+                    <div className="relative overflow-hidden">
+                      <div className="text-sm text-text-secondary line-clamp-3">
+                        {entry.content}
+                      </div>
+                      <div
+                        className="absolute bottom-0 left-0 right-0 h-5 pointer-events-none"
+                        style={{ background: "linear-gradient(to top, #292524, transparent)" }}
+                      />
                     </div>
                     {entry.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-3">
@@ -297,6 +358,48 @@ export default function MemoryLog() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {/* Entry Modal */}
+      {expandedEntry && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-6">
+          <div className="w-full max-w-2xl bg-surface border border-border rounded-xl flex flex-col max-h-[80vh]">
+            {/* Modal header */}
+            <div className="flex items-start justify-between p-5 border-b border-border flex-shrink-0">
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2">
+                  <Badge color={typeBadgeColors[expandedEntry.type] || "default"}>
+                    {expandedEntry.type}
+                  </Badge>
+                  <span className="text-xs text-text-secondary">
+                    {expandedEntry.author === "apollo" ? "Apollo" : "Ivan"}
+                  </span>
+                  <span className="text-xs font-mono text-text-secondary/60">{expandedEntry.date}</span>
+                </div>
+                <h3 className="font-heading text-lg">{expandedEntry.title}</h3>
+              </div>
+              <button
+                onClick={() => setExpandedEntry(null)}
+                className="text-text-secondary hover:text-text-primary transition-colors flex-shrink-0 ml-4"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            {/* Modal content */}
+            <div className="flex-1 overflow-y-auto p-5">
+              <div className="prose prose-invert prose-sm max-w-none text-text-secondary">
+                <ReactMarkdown>{expandedEntry.content}</ReactMarkdown>
+              </div>
+            </div>
+            {/* Modal footer */}
+            {expandedEntry.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 p-5 border-t border-border flex-shrink-0">
+                {expandedEntry.tags.map((tag) => (
+                  <Badge key={tag} color="muted" className="!text-[10px]">{tag}</Badge>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
